@@ -1,7 +1,7 @@
 package org.example.backend.exception;
 
 import org.example.backend.component.ApiError;
-import org.example.backend.dto.ApiErrorResponse;
+import org.example.backend.dto.ApiErrorResponseDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<ApiErrorResponse> handleBadCredentials(BadCredentialsException e) {
+    public ResponseEntity<ApiErrorResponseDto> handleBadCredentials(BadCredentialsException e) {
         ApiError error = new ApiError(
                 "401",
                 "INVALID_CREDENTIALS",
@@ -20,6 +20,6 @@ public class GlobalExceptionHandler {
                 "Username or password is incorrect.",
                 "/auth/login"
         );
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ApiErrorResponse.of(error));
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ApiErrorResponseDto.of(error));
     }
 }

@@ -4,15 +4,15 @@ import org.example.backend.component.ApiError;
 
 import java.util.List;
 
-public class ApiErrorResponse {
+public class ApiErrorResponseDto {
     private List<ApiError> errors;
 
-    public ApiErrorResponse(List<ApiError> errors) {
+    public ApiErrorResponseDto(List<ApiError> errors) {
         this.errors = errors;
     }
 
-    public static ApiErrorResponse of(ApiError... errors) {
-        return new ApiErrorResponse(List.of(errors));
+    public static ApiErrorResponseDto of(ApiError... errors) {
+        return new ApiErrorResponseDto(List.of(errors));
     }
 
     public List<ApiError> getErrors() {

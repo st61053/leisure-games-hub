@@ -1,9 +1,9 @@
 package org.example.backend.controller;
 
-import org.example.backend.dto.ApiResponse;
-import org.example.backend.dto.AuthRequest;
-import org.example.backend.dto.AuthResponse;
-import org.example.backend.dto.RegisterRequest;
+import org.example.backend.dto.ApiResponseDto;
+import org.example.backend.dto.AuthRequestDto;
+import org.example.backend.dto.AuthResponseDto;
+import org.example.backend.dto.RegisterRequestDto;
 import org.example.backend.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -20,12 +20,12 @@ public class AuthController {
     private AuthService authService;
 
     @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest request) {
+    public ResponseEntity<AuthResponseDto> register(@RequestBody RegisterRequestDto request) {
         return ResponseEntity.ok(authService.register(request));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<AuthResponse>> login(@RequestBody AuthRequest request) {
+    public ResponseEntity<ApiResponseDto<AuthResponseDto>> login(@RequestBody AuthRequestDto request) {
         return ResponseEntity.ok(authService.authenticate(request));
     }
 }

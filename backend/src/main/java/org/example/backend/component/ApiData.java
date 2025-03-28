@@ -9,7 +9,7 @@ import lombok.*;
 @ToString
 
 public class ApiData<T> {
-    private Object id;
+    private String id;
     private String type;
     private T attributes;
 }

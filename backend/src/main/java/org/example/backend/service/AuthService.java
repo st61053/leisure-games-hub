@@ -1,10 +1,10 @@
 package org.example.backend.service;
 
 import org.example.backend.component.ApiResourceType;
-import org.example.backend.dto.ApiResponse;
-import org.example.backend.dto.AuthRequest;
-import org.example.backend.dto.AuthResponse;
-import org.example.backend.dto.RegisterRequest;
+import org.example.backend.dto.ApiResponseDto;
+import org.example.backend.dto.AuthRequestDto;
+import org.example.backend.dto.AuthResponseDto;
+import org.example.backend.dto.RegisterRequestDto;
 import org.example.backend.component.ApiData;
 import org.example.backend.entity.Role;
 import org.example.backend.entity.User;
@@ -39,7 +39,7 @@ public class AuthService {
     @Autowired
     private CustomUserDetailsService userDetailsService;
 
-    public AuthResponse register(RegisterRequest request) {
+    public AuthResponseDto register(RegisterRequestDto request) {
         if (userRepository.findByUsername(request.username()).isPresent()) {
             throw new RuntimeException("Username already exists");
         }
@@ -58,10 +58,10 @@ public class AuthService {
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername());
         String jwt = jwtUtil.generateToken(userDetails);
-        return new AuthResponse(jwt);
+        return new AuthResponseDto(jwt);
     }
 
-    public ApiResponse<AuthResponse> authenticate(AuthRequest request) {
+    public ApiResponseDto<AuthResponseDto> authenticate(AuthRequestDto request) {
         UserDetails userDetails = userDetailsService.loadUserByUsername(request.username());
 
         if (!passwordEncoder.matches(request.password(), userDetails.getPassword())) {
@@ -69,10 +69,10 @@ public class AuthService {
         }
 
         String jwt = jwtUtil.generateToken(userDetails);
-        AuthResponse response = new AuthResponse(jwt);
+        AuthResponseDto response = new AuthResponseDto(jwt);
 
-        ApiData<AuthResponse> dataItem = new ApiData<>(UUID.randomUUID().toString(), ApiResourceType.TOKEN.getValue(), response);
-        return new ApiResponse<>(List.of(dataItem));
+        ApiData<AuthResponseDto> dataItem = new ApiData<>(UUID.randomUUID().toString(), ApiResourceType.TOKEN.getValue(), response);
+        return new ApiResponseDto<>(List.of(dataItem));
     }
 }
 
