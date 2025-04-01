@@ -4,14 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.example.backend.component.ApiData;
 import org.example.backend.component.ApiResourceType;
 import org.example.backend.dto.*;
-import org.example.backend.entity.Game;
-import org.example.backend.entity.GameCategory;
-import org.example.backend.entity.Place;
-import org.example.backend.entity.User;
-import org.example.backend.repository.GameCategoryRepository;
-import org.example.backend.repository.GameRepository;
-import org.example.backend.repository.PlaceRepository;
-import org.example.backend.repository.UserRepository;
+import org.example.backend.entity.*;
+import org.example.backend.enums.GameCollectionType;
+import org.example.backend.repository.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -170,7 +165,8 @@ public class GameService {
                 game.getAuthor().getId(),
                 game.getCreatedBy().getId(),
                 game.getCreatedAt(),
-                game.getUpdatedAt()
+                game.getUpdatedAt(),
+                game.getFavorites()
         );
     }
 }

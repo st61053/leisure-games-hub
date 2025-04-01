@@ -55,4 +55,7 @@ public class Game {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Place place;
+
+    @Column(nullable = false)
+    private int favorites = 0;
 }

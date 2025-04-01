@@ -1,17 +1,17 @@
 package org.example.backend.service;
 
+import lombok.AllArgsConstructor;
 import org.example.backend.component.ApiResourceType;
-import org.example.backend.dto.ApiResponseDto;
-import org.example.backend.dto.AuthRequestDto;
-import org.example.backend.dto.AuthResponseDto;
-import org.example.backend.dto.RegisterRequestDto;
+import org.example.backend.dto.*;
 import org.example.backend.component.ApiData;
+import org.example.backend.entity.GameCollection;
 import org.example.backend.entity.Role;
 import org.example.backend.entity.User;
 import org.example.backend.repository.RoleRepository;
 import org.example.backend.repository.UserRepository;
 import org.example.backend.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,25 +21,20 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+
+@AllArgsConstructor
+
 @Service
 public class AuthService {
 
-    @Autowired
     private UserRepository userRepository;
-
-    @Autowired
     private RoleRepository roleRepository;
-
-    @Autowired
     private PasswordEncoder passwordEncoder;
-
-    @Autowired
     private JwtUtil jwtUtil;
-
-    @Autowired
+    private GameCollectionService gameCollectionService;
     private CustomUserDetailsService userDetailsService;
 
-    public AuthResponseDto register(RegisterRequestDto request) {
+    public ResponseEntity<ActionResponseDto> register(RegisterRequestDto request) {
         if (userRepository.findByUsername(request.username()).isPresent()) {
             throw new RuntimeException("Username already exists");
         }
@@ -49,16 +44,22 @@ public class AuthService {
 
         User user = new User();
         user.setUsername(request.username());
-        user.setFirstname(request.firstName());
-        user.setLastname(request.lastName());
+        user.setFirstname(request.firstname());
+        user.setLastname(request.lastname());
         user.setEmail(request.email());
         user.setPassword(passwordEncoder.encode(request.password()));
         user.setRoles(Set.of(role));
         userRepository.save(user);
 
-        UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername());
-        String jwt = jwtUtil.generateToken(userDetails);
-        return new AuthResponseDto(jwt);
+        gameCollectionService.createDefaultFavoriteCollection(user);
+
+        ActionResultDto result = new ActionResultDto(
+                user.getId(),
+                "success",
+                "USER_CREATED"
+        );
+
+        return ResponseEntity.ok(new ActionResponseDto(List.of(result)));
     }
 
     public ApiResponseDto<AuthResponseDto> authenticate(AuthRequestDto request) {
@@ -73,6 +74,7 @@ public class AuthService {
 
         ApiData<AuthResponseDto> dataItem = new ApiData<>(UUID.randomUUID().toString(), ApiResourceType.TOKEN.getValue(), response);
         return new ApiResponseDto<>(List.of(dataItem));
+
     }
 }
 

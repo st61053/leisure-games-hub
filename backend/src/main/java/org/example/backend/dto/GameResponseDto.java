@@ -14,5 +14,6 @@ public record GameResponseDto(
         String author,
         String createdBy,
         LocalDateTime createdAt,
-        LocalDateTime updatedAt
+        LocalDateTime updatedAt,
+        Integer favorites
 ) {}

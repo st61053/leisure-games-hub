@@ -37,5 +37,6 @@ public class GameController {
     public ResponseEntity<ApiResponseDto<GameResponseDto>> getAll() {
         return ResponseEntity.ok(gameService.getAll());
     }
+
 }
 
