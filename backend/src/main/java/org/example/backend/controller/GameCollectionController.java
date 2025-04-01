@@ -1,5 +1,6 @@
 package org.example.backend.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.example.backend.dto.*;
 import org.example.backend.service.GameCollectionService;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/collections")
 @RequiredArgsConstructor
+@Tag(name = "GameCollections")
 public class GameCollectionController {
 
     private final GameCollectionService gameCollectionService;
