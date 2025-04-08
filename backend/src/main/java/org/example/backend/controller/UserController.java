@@ -19,4 +19,9 @@ public class UserController {
     public ResponseEntity<ApiResponseDto<UserResponseDto>> getAll() {
         return ResponseEntity.ok(userService.getAll());
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponseDto<UserResponseDto>> get(@PathVariable String id) {
+        return ResponseEntity.ok(userService.get(id));
+    }
 }

@@ -63,14 +63,16 @@ public class AuthService {
     }
 
     public ApiResponseDto<AuthResponseDto> authenticate(AuthRequestDto request) {
-        UserDetails userDetails = userDetailsService.loadUserByUsername(request.username());
+        UserDetails userDetails = userDetailsService.loadUserByEmail(request.email());
+
+        User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow();
 
         if (!passwordEncoder.matches(request.password(), userDetails.getPassword())) {
             throw new BadCredentialsException("Invalid credentials");
         }
 
         String jwt = jwtUtil.generateToken(userDetails);
-        AuthResponseDto response = new AuthResponseDto(jwt);
+        AuthResponseDto response = new AuthResponseDto(jwt, user.getId());
 
         ApiData<AuthResponseDto> dataItem = new ApiData<>(UUID.randomUUID().toString(), ApiResourceType.TOKEN.getValue(), response);
         return new ApiResponseDto<>(List.of(dataItem));
