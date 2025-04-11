@@ -52,7 +52,7 @@ public class DataInitializer implements CommandLineRunner {
         });
 
         // Categories init
-        List<String> defaultCategories = List.of("sports", "movement", "team", "ball");
+        List<String> defaultCategories = List.of("sports", "movement", "team", "ball", "short", "long");
 
         defaultCategories.forEach(cat -> {
             if (categoryRepository.findByName(cat).isEmpty()) {

@@ -40,7 +40,8 @@ const AppDrawer = () => {
             </HStack>
             <Divider />
             <VStack style={{
-                padding: 8
+                padding: 8,
+                paddingHorizontal: 16,
             }}>
                 <Pressable>
                     {({ pressed }) => (

@@ -13,6 +13,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -147,6 +148,28 @@ public class GameService {
                 .toList();
 
         return new ApiResponseDto<>(data);
+    }
+
+    public ApiResponseDto<GameResponseDto> filterGames(String place, List<String> categories, String name) {
+        List<Game> games = gameRepository.findAll();
+
+        List<Game> filtered = games.stream()
+                .filter(game -> place == null || game.getPlace().getId().equals(place))
+                .filter(game -> {
+                    if (categories == null || categories.isEmpty()) return true;
+                    List<String> gameCategoryIds = game.getCategories().stream()
+                            .map(GameCategory::getId)
+                            .toList();
+                    return new HashSet<>(gameCategoryIds).containsAll(categories);
+                })
+                .filter(game -> name == null || game.getName().toLowerCase().contains(name.toLowerCase()))
+                .toList();
+
+        List<ApiData<GameResponseDto>> response = filtered.stream()
+                .map(game -> new ApiData<>(game.getId(), ApiResourceType.GAME.getValue(), mapToResponse(game)))
+                .toList();
+
+        return new ApiResponseDto<>(response);
     }
 
     private GameResponseDto mapToResponse(Game game) {

@@ -1,7 +1,7 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { View } from 'react-native';
-import { Calendar1, House, MessageSquareText } from 'lucide-react-native';
+import { Calendar1, House, MessageSquareText, NotebookText } from 'lucide-react-native';
 import HomeStackNavigator from './HomeStackNavigator';
 import { Icon } from '@/components/ui/icon';
 import ProfileStackNavigator from './ProfileStackNavigator';
@@ -48,6 +48,14 @@ const TabNavigator = () => {
                         tabBarIcon: ({ focused }) => <Icon style={{ marginTop: 20, color: focused ? "#1976d2" : "#4D4D4D" }} size='xl' className="text-typography-500" as={Calendar1} />,
                     }}
                 />
+                {/* <Tab.Screen
+                    name="Collection"
+                    component={Placeholder}
+                    options={{
+                        tabBarShowLabel: false,
+                        tabBarIcon: ({ focused }) => <Icon style={{ marginTop: 20, color: focused ? "#1976d2" : "#4D4D4D" }} size='xl' className="text-typography-500" as={NotebookText} />,
+                    }}
+                /> */}
                 <Tab.Screen
                     name="Chat"
                     component={Placeholder}

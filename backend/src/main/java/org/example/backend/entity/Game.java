@@ -23,6 +23,7 @@ public class Game {
 
     private String name;
 
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     @ManyToMany(fetch = FetchType.LAZY)

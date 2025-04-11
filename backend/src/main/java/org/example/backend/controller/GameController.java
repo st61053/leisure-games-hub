@@ -7,6 +7,8 @@ import org.example.backend.service.GameService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/games")
 @RequiredArgsConstructor
@@ -40,5 +42,13 @@ public class GameController {
         return ResponseEntity.ok(gameService.getAll());
     }
 
+    @GetMapping("/filter")
+    public ResponseEntity<ApiResponseDto<GameResponseDto>> filterGames(
+            @RequestParam(required = false) String place,
+            @RequestParam(required = false) List<String> categories,
+            @RequestParam(required = false) String name
+    ) {
+        return ResponseEntity.ok(gameService.filterGames(place, categories, name));
+    }
 }
 
