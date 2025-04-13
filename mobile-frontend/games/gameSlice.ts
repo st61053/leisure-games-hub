@@ -4,6 +4,7 @@ import { ICategory, IGame, IGameState, IPlace } from './types'
 import { getPlaces } from './api/getPlaces'
 import { getCategories } from './api/getCategories'
 import { getFilteredGames } from './api/getFilteredGames'
+import { RootState } from '@/app/store'
 
 const initialState: IGameState = {
     games: [],
@@ -21,6 +22,11 @@ export const gameSlice = createSlice({
             if (category) {
                 category.attributes.active = !category.attributes.active;
             }
+        }
+    },
+    selectors: {
+        getGamesById: (state) => (id: string) => {
+            return state.games.find((game) => game.id === id);
         }
     },
     extraReducers: (builder) => {
@@ -53,6 +59,10 @@ export const gameSlice = createSlice({
     },
 })
 
+export const getGameById = (id: string) => (state: RootState) =>
+    state.game.games.find((game) => game.id === id);
+
 export const { activeCategory } = gameSlice.actions;
+export const { getGamesById } = gameSlice.selectors;
 
 export default gameSlice.reducer

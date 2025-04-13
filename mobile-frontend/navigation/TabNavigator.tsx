@@ -1,7 +1,7 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { View } from 'react-native';
-import { Calendar1, House, MessageSquareText, NotebookText } from 'lucide-react-native';
+import { Calendar1, House, MessageSquareText } from 'lucide-react-native';
 import HomeStackNavigator from './HomeStackNavigator';
 import { Icon } from '@/components/ui/icon';
 import ProfileStackNavigator from './ProfileStackNavigator';

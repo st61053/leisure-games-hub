@@ -40,6 +40,7 @@ const Games = () => {
                 paddingHorizontal: 24,
                 paddingTop: 20,
                 paddingBottom: 4,
+                paddingRight: 12,
                 display: 'flex',
                 flexDirection: 'row',
                 justifyContent: "space-between",
@@ -104,7 +105,8 @@ const Games = () => {
                                             shadowOpacity: 0.15,
                                             shadowRadius: 4,
                                             elevation: 4, // pro Android
-                                            transform: pressed ? [{ scale: 0.95 }] : [{ scale: 1 }],
+                                            borderWidth: 2,
+                                            borderColor: pressed ? "#4D4D4D" : "transparent",
                                         }}
                                     >
                                         {icon}

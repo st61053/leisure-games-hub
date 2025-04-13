@@ -5,6 +5,7 @@ import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { RootState } from '@/app/store';
 import UserLoginForm from '@/user/components/UserLoginForm';
 import { getUser } from '@/user/api/getUser';
+import { StatusBar } from 'react-native';
 
 const RootNavigator = () => {
 
@@ -21,7 +22,11 @@ const RootNavigator = () => {
 
     return (
         <GluestackUIProvider mode="light">
-            {jwt ? <TabNavigator /> : <UserLoginForm />}
+            <>
+                <StatusBar barStyle="dark-content" translucent={true} />
+                {jwt ? <TabNavigator /> : <UserLoginForm />}
+            </>
+
         </GluestackUIProvider>
     )
 

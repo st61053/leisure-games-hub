@@ -7,7 +7,6 @@ import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
 import { VStack } from "@/components/ui/vstack";
 import { HomeStackParamList } from "@/navigation/types";
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { ScrollView, Keyboard, TouchableWithoutFeedback, Pressable } from 'react-native';
 import { PlaceType } from "../types";
 import { createPlacesMap } from "../constants";
@@ -20,12 +19,14 @@ import { Spinner } from "@/components/ui/spinner";
 import { ChevronDown, Layers, Plus } from "lucide-react-native";
 import { Text } from "@/components/ui/text";
 import { activeCategory } from "../gameSlice";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 const GamePlaceList = () => {
 
     const dispatch = useAppDispatch();
 
-    const navigation = useNavigation<NativeStackNavigationProp<HomeStackParamList, 'GamePlace'>>();
+    type NavigationProp = NativeStackNavigationProp<HomeStackParamList, 'Games'>;
+    const navigation = useNavigation<NavigationProp>();
     const route = useRoute<RouteProp<HomeStackParamList, 'GamePlace'>>();
 
     const { place } = route.params;
@@ -65,12 +66,13 @@ const GamePlaceList = () => {
             <Box>
                 <Box style={{
                     paddingVertical: 20,
-                    paddingBottom: 16,
+                    paddingBottom: 12,
                     display: 'flex',
                     flexDirection: 'column',
                 }}>
                     <Box style={{
                         paddingHorizontal: 24,
+                        paddingRight: 12,
                         display: 'flex',
                         flexDirection: 'row',
                         justifyContent: "space-between",
@@ -79,7 +81,13 @@ const GamePlaceList = () => {
                         <Heading size="2xl" style={{ color: "#4D4D4D" }}>
                             {text}
                         </Heading>
-                        <Pressable>
+                        <Pressable
+                            onPress={() => {
+                                navigation.navigate('CreateGame', {
+                                    placeId: placeId,
+                                });
+                            }}
+                        >
                             {({ pressed }) => (
                                 <Box style={{
                                     display: 'flex',
@@ -126,19 +134,19 @@ const GamePlaceList = () => {
                                             borderRadius: 12,
                                             backgroundColor: category.attributes.active ? "#4D4D4D" : "#fff",
                                             borderWidth: 1,
-                                            borderColor: "#4D4D4D",
+                                            borderColor: category.attributes.active ? "#4D4D4D" : "#D4D4D4",
                                         }}
                                         onPress={() => {
                                             dispatch(activeCategory(category.id));
                                         }}
                                     >
-                                        <ButtonText style={{ color: category.attributes.active ? "#fff" : "#4D4D4D" }}>{category.attributes.name.charAt(0).toUpperCase() + category.attributes.name.slice(1)}</ButtonText>
+                                        <ButtonText style={{ color: category.attributes.active ? "#fff" : "#929292" }}>{category.attributes.name.charAt(0).toUpperCase() + category.attributes.name.slice(1)}</ButtonText>
                                     </Button>
                                 )
                             })}
                         </HStack>
                     </ScrollView>
-                    <HStack style={{ paddingHorizontal: 24, marginTop: 4, paddingLeft: 28 }} space="xl">
+                    <HStack style={{ paddingHorizontal: 24, paddingLeft: 28 }} space="xl">
                         <Button variant="link">
                             <ButtonText className="font-medium text-md text-typography-900">
                                 Favorites
@@ -164,7 +172,7 @@ const GamePlaceList = () => {
                         {loading ? <Spinner /> : games.map((game) => <GameItem key={game.id} game={game} place={place} />)}
                         {games.length === 0 && !loading &&
                             <HStack style={{ alignItems: "center", paddingVertical: 8 }} space="md" >
-                                <Layers size={48} color={"#AEAEAE"} />
+                                <Layers size={48} color={"#929292"} />
                                 <VStack>
                                     <Heading size="md" style={{ color: "#4D4D4D" }}>
                                         Oops!
@@ -173,7 +181,6 @@ const GamePlaceList = () => {
                                         Nothing to play here.
                                     </Text>
                                 </VStack>
-
                             </HStack>
                         }
                     </VStack>
