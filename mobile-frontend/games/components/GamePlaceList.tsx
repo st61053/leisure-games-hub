@@ -6,13 +6,13 @@ import { SearchIcon } from "@/components/ui/icon";
 import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
 import { VStack } from "@/components/ui/vstack";
 import { HomeStackParamList } from "@/navigation/types";
-import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
+import { RouteProp, useFocusEffect, useNavigation, useRoute } from "@react-navigation/native";
 import { ScrollView, Keyboard, TouchableWithoutFeedback, Pressable } from 'react-native';
 import { PlaceType } from "../types";
 import { createPlacesMap } from "../constants";
 import { useAppDispatch, useAppSelector } from "@/app/hooks";
 import { RootState } from "@/app/store";
-import { useEffect } from "react";
+import { useCallback } from "react";
 import { getFilteredGames } from "../api/getFilteredGames";
 import GameItem from "./GameItem";
 import { Spinner } from "@/components/ui/spinner";
@@ -57,9 +57,11 @@ const GamePlaceList = () => {
             ]));
     }
 
-    useEffect(() => {
-        fetchGames();
-    }, [place, categories]);
+    useFocusEffect(
+        useCallback(() => {
+            fetchGames();
+        }, [place, categories])
+    );
 
     return (
         <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>

@@ -7,23 +7,29 @@ import { Input, InputField } from "@/components/ui/input";
 import { Select, SelectBackdrop, SelectContent, SelectDragIndicator, SelectDragIndicatorWrapper, SelectIcon, SelectInput, SelectItem, SelectPortal, SelectTrigger } from "@/components/ui/select";
 import { VStack } from "@/components/ui/vstack";
 import { HomeStackParamList } from "@/navigation/types";
-import { RouteProp, useRoute } from "@react-navigation/native";
+import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import { ChevronDownIcon, CircleX, User } from "lucide-react-native";
 import { Controller, useForm } from "react-hook-form";
 import { Keyboard, KeyboardAvoidingView, Pressable, ScrollView, TouchableWithoutFeedback } from "react-native";
 import { createPlacesMap } from "../constants";
-import { PlaceType } from "../types";
+import { IGame, PlaceType } from "../types";
 import { DurationPickerField } from "./DurationPickerField";
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
 import { useState } from "react";
 import { Textarea, TextareaInput } from "@/components/ui/textarea";
+import { createGame } from "../api/createGame";
+import { ApiObjectType } from "@/app/config";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 const GameEditor = () => {
 
     const dispatch = useAppDispatch();
 
     const route = useRoute<RouteProp<HomeStackParamList, 'CreateGame'>>();
+    type NavigationProp = NativeStackNavigationProp<HomeStackParamList, 'Games'>;
+    const navigation = useNavigation<NavigationProp>();
+
     const { placeId, gameId } = route.params;
 
     const categories = useAppSelector((state) => state.game.categories);
@@ -66,8 +72,39 @@ const GameEditor = () => {
         },
     })
 
-    const onCreate = (data: GameFormValues) => {
+    const onSubmit = async (data: GameFormValues) => {
 
+        const initialGame: IGame = {
+
+            attributes: {
+                name: "",
+                description: "",
+                place: "",
+                categories: [],
+                duration: 0,
+                minPlayers: 0,
+                equipment: [],
+                author: "",
+                createdBy: "",
+                createdAt: "",
+                updatedAt: "",
+                favorites: 0
+            },
+            id: gameId ?? "",
+            type: ApiObjectType.GAME
+        }
+
+        await dispatch(createGame({
+
+            ...initialGame,
+            attributes: {
+                ...initialGame.attributes,
+                ...data,
+                duration: Number(data.duration),
+                minPlayers: Number(data.minPlayers),
+            }
+        }))
+        navigation.goBack()
     }
 
     const labelSize = "sm";
@@ -320,7 +357,7 @@ const GameEditor = () => {
                                                         value={newEquipment}
                                                         type="text"
                                                         keyboardType="default"
-                                                        placeholder="Ball..."
+                                                        placeholder="Ball"
                                                     />
                                                 </Input>
                                                 <Button
@@ -428,10 +465,10 @@ const GameEditor = () => {
                         borderRadius: 12,
                     }}
                     onPress={() => {
-                        handleSubmit(onCreate)();
+                        handleSubmit(onSubmit)();
                     }}
                 >
-                    <ButtonText className="text-typography-0">Create</ButtonText>
+                    <ButtonText className="text-typography-0">{game?.id ? "Edit" : "Create"}</ButtonText>
                 </Button>
             </Box>
         </TouchableWithoutFeedback>

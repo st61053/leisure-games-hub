@@ -48,14 +48,6 @@ const TabNavigator = () => {
                         tabBarIcon: ({ focused }) => <Icon style={{ marginTop: 20, color: focused ? "#1976d2" : "#4D4D4D" }} size='xl' className="text-typography-500" as={Calendar1} />,
                     }}
                 />
-                {/* <Tab.Screen
-                    name="Collection"
-                    component={Placeholder}
-                    options={{
-                        tabBarShowLabel: false,
-                        tabBarIcon: ({ focused }) => <Icon style={{ marginTop: 20, color: focused ? "#1976d2" : "#4D4D4D" }} size='xl' className="text-typography-500" as={NotebookText} />,
-                    }}
-                /> */}
                 <Tab.Screen
                     name="Chat"
                     component={Placeholder}

@@ -1,5 +1,5 @@
 
-export const SERVER_URL = 'http://192.168.1.100:9090/api/v1';
+export const SERVER_URL = 'http://10.221.42.69:9090/api/v1';
 
 type HttpMethod = "GET" | "POST" | "PUT" | "DELETE";
 
@@ -35,4 +35,5 @@ export interface IApiObject {
 
 export enum ApiObjectType {
     USER = 'user',
+    GAME = 'game',
 }

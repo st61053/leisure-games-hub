@@ -10,4 +10,7 @@ export type HomeStackParamList = {
         placeId?: string;
         gameId?: string;
     };
+    EditGame: {
+        gameId?: string;
+    };
 };

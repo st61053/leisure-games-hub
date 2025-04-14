@@ -38,12 +38,12 @@ public class GameController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponseDto<GameResponseDto>> getAll() {
+    public ResponseEntity<ApiResponseDto<GameShortResponseDto>> getAll() {
         return ResponseEntity.ok(gameService.getAll());
     }
 
     @GetMapping("/filter")
-    public ResponseEntity<ApiResponseDto<GameResponseDto>> filterGames(
+    public ResponseEntity<ApiResponseDto<GameShortResponseDto>> filterGames(
             @RequestParam(required = false) String place,
             @RequestParam(required = false) List<String> categories,
             @RequestParam(required = false) String name

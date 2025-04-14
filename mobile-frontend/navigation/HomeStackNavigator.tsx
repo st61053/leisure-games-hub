@@ -99,6 +99,27 @@ const HomeStackNavigator = () => {
                     };
                 }}
             />
+            <Stack.Screen
+                name="EditGame"
+                component={GameEditor}
+                options={({ navigation }) => {
+                    return {
+                        title: "Edit Game",
+                        headerLeft: () => (
+                            <TouchableOpacity
+                                onPress={() => navigation.goBack()}
+                                style={{ paddingHorizontal: 4 }}
+                            >
+                                <Icon
+                                    size="xl"
+                                    as={ChevronLeft}
+                                    style={{ color: '#4D4D4D' }}
+                                />
+                            </TouchableOpacity>
+                        ),
+                    };
+                }}
+            />
         </Stack.Navigator >
     )
 };

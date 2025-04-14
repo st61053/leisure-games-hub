@@ -41,8 +41,7 @@ public class Game {
     @ElementCollection
     private List<String> equipment;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private User author;
+    private String author;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private User createdBy;

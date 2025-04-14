@@ -5,6 +5,7 @@ import { getPlaces } from './api/getPlaces'
 import { getCategories } from './api/getCategories'
 import { getFilteredGames } from './api/getFilteredGames'
 import { RootState } from '@/app/store'
+import { getGame } from './api/getGame'
 
 const initialState: IGameState = {
     games: [],
@@ -44,6 +45,19 @@ export const gameSlice = createSlice({
                         active: false,
                     },
                 }));
+            })
+            // GET GAME
+            .addCase(getGame.fulfilled, (state, action: PayloadAction<IGame>) => {
+                const updatedGame = action.payload;
+                const index = state.games.findIndex(game => game.id === updatedGame.id);
+
+                if (index !== -1) {
+                    state.games[index] = updatedGame;
+                } else {
+                    state.games.push(updatedGame);
+                }
+
+                state.loading = false;
             })
             // GET FILTERED GAMES
             .addCase(getFilteredGames.pending, (state) => {

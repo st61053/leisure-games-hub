@@ -33,9 +33,6 @@ public class GameService {
         User createdBy = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        User author = userRepository.findById(request.author())
-                .orElseThrow(() -> new RuntimeException("Author not found"));
-
         Place place = placeRepository.findById(request.place())
                 .orElseThrow(() -> new RuntimeException("Place not found"));
 
@@ -53,7 +50,7 @@ public class GameService {
         game.setMinPlayers(request.minPlayers());
         game.setEquipment(request.equipment());
         game.setCreatedBy(createdBy);
-        game.setAuthor(author);
+        game.setAuthor(request.author());
 
         gameRepository.save(game);
 
@@ -86,7 +83,7 @@ public class GameService {
                 .anyMatch(role -> role.getName().equalsIgnoreCase("ADMIN"));
 
         // Je původní autor hry?
-        boolean isAuthor = game.getAuthor().getId().equals(currentUser.getId());
+        boolean isAuthor = game.getCreatedBy().getId().equals(currentUser.getId());
 
         if (!isAdmin && !isAuthor) {
             throw new AccessDeniedException("You are not allowed to update this game.");
@@ -96,10 +93,6 @@ public class GameService {
                 .map(catId -> gameCategoryRepository.findById(catId)
                         .orElseThrow(() -> new RuntimeException("Category not found: " + catId)))
                 .collect(Collectors.toCollection(ArrayList::new));
-
-        // Nový autor
-        User newAuthor = userRepository.findById(request.author())
-                .orElseThrow(() -> new RuntimeException("Author not found"));
 
         Place place = placeRepository.findById(request.place())
                 .orElseThrow(() -> new RuntimeException("Place not found"));
@@ -112,7 +105,7 @@ public class GameService {
         game.setDuration(request.duration());
         game.setMinPlayers(request.minPlayers());
         game.setEquipment(request.equipment());
-        game.setAuthor(newAuthor); // může být i jiný autor
+        game.setAuthor(request.author()); // může být i jiný autor
 
         gameRepository.save(game);
 
@@ -138,19 +131,19 @@ public class GameService {
         return ResponseEntity.ok(new ActionResponseDto(List.of(result)));
     }
 
-    public ApiResponseDto<GameResponseDto> getAll() {
-        List<ApiData<GameResponseDto>> data = gameRepository.findAll().stream()
+    public ApiResponseDto<GameShortResponseDto> getAll() {
+        List<ApiData<GameShortResponseDto>> data = gameRepository.findAll().stream()
                 .map(game -> new ApiData<>(
                         game.getId(),
                         ApiResourceType.GAME.getValue(),
-                        mapToResponse(game)
+                        mapToShortResponse(game)
                 ))
                 .toList();
 
         return new ApiResponseDto<>(data);
     }
 
-    public ApiResponseDto<GameResponseDto> filterGames(String place, List<String> categories, String name) {
+    public ApiResponseDto<GameShortResponseDto> filterGames(String place, List<String> categories, String name) {
         List<Game> games = gameRepository.findAll();
 
         List<Game> filtered = games.stream()
@@ -165,8 +158,8 @@ public class GameService {
                 .filter(game -> name == null || game.getName().toLowerCase().contains(name.toLowerCase()))
                 .toList();
 
-        List<ApiData<GameResponseDto>> response = filtered.stream()
-                .map(game -> new ApiData<>(game.getId(), ApiResourceType.GAME.getValue(), mapToResponse(game)))
+        List<ApiData<GameShortResponseDto>> response = filtered.stream()
+                .map(game -> new ApiData<>(game.getId(), ApiResourceType.GAME.getValue(), mapToShortResponse(game)))
                 .toList();
 
         return new ApiResponseDto<>(response);
@@ -185,7 +178,26 @@ public class GameService {
                 game.getDuration(),
                 game.getMinPlayers(),
                 game.getEquipment(),
-                game.getAuthor().getId(),
+                game.getAuthor(),
+                game.getCreatedBy().getId(),
+                game.getCreatedAt(),
+                game.getUpdatedAt(),
+                game.getFavorites()
+        );
+    }
+
+    private GameShortResponseDto mapToShortResponse(Game game) {
+        List<String> categoryNames = game.getCategories().stream()
+                .map(GameCategory::getId)
+                .toList();
+
+        return new GameShortResponseDto(
+                game.getName(),
+                game.getPlace().getId(),
+                categoryNames,
+                game.getDuration(),
+                game.getMinPlayers(),
+                game.getAuthor(),
                 game.getCreatedBy().getId(),
                 game.getCreatedAt(),
                 game.getUpdatedAt(),
