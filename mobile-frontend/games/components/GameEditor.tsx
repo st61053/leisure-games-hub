@@ -207,7 +207,7 @@ const GameEditor = () => {
                                                 render={({ field: { onChange, value } }) => {
 
                                                     const initialPlace = places.find((place) => place.id === value);
-                                                    const { text } = placesMap[initialPlace?.attributes.name as PlaceType];
+                                                    const text = initialPlace ? placesMap[initialPlace?.attributes.name as PlaceType].text : undefined;
 
                                                     return (
                                                         <Select
@@ -230,7 +230,7 @@ const GameEditor = () => {
                                                                     flexDirection: "row",
                                                                 }}
                                                             >
-                                                                <SelectInput placeholder="Select option" />
+                                                                <SelectInput placeholder="Select place" />
                                                                 <SelectIcon style={{ marginRight: 8 }} as={ChevronDownIcon} />
                                                             </SelectTrigger>
                                                             <SelectPortal>

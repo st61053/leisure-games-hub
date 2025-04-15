@@ -1,19 +1,26 @@
-import { useAppDispatch, useAppSelector } from "@/app/hooks";
-import { RootState } from "@/app/store";
-import { Text } from "@/components/ui/text"
-import { useEffect } from "react";
+import { useAppDispatch } from "@/app/hooks";
+import { useEffect, useState } from "react";
 import { getPlaces } from "../api/getPlaces";
 import { Box } from "@/components/ui/box";
 import { Pressable } from "@/components/ui/pressable";
-import { PlaceType } from "../types";
-import { ScrollView } from "react-native";
 import { Heading } from "@/components/ui/heading";
-import { useNavigation } from "@react-navigation/native";
+import { getCategories } from "../api/getCategories";
+import { LandPlot, LayoutList, LibraryBig, MenuIcon, Plus } from "lucide-react-native";
+import { getCollections } from "@/collections/api/getCollections";
+import GamesViewPlaces from "./GamesViewPlaces";
+import GamesController from "./GamesControler";
+import { Modal, ModalBackdrop } from "@/components/ui/modal";
+import { Menu, MenuItem, MenuItemLabel, MenuSeparator } from "@/components/ui/menu";
+import { Icon } from "@/components/ui/icon";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { HomeStackParamList } from "@/navigation/types";
-import { createPlacesMap } from "../constants";
-import { getCategories } from "../api/getCategories";
-import { SlidersHorizontal } from "lucide-react-native";
+import { useNavigation } from "@react-navigation/native";
+
+enum GamesView {
+    PLACES = "places",
+    ALL_GAMES = "all_games",
+    COLLECTIONS = "collections",
+}
 
 
 const Games = () => {
@@ -23,14 +30,31 @@ const Games = () => {
     type NavigationProp = NativeStackNavigationProp<HomeStackParamList, 'Games'>;
     const navigation = useNavigation<NavigationProp>();
 
-    const places = useAppSelector((state: RootState) => state.game.places);
-
     useEffect(() => {
         dispatch(getPlaces());
         dispatch(getCategories());
+        dispatch(getCollections());
     }, []);
 
-    const placesMap = createPlacesMap(64);
+    const [gamesView, setGamesView] = useState<GamesView>(GamesView.ALL_GAMES);
+
+    const gamesViewMap = {
+        [GamesView.PLACES]: {
+            title: "Places",
+            component: <GamesViewPlaces />,
+        },
+        [GamesView.ALL_GAMES]: {
+            title: "All Games",
+            component: <GamesController />,
+        },
+        [GamesView.COLLECTIONS]: {
+            title: "Collections",
+            component: <GamesViewPlaces />,
+        }
+    }
+
+    const { title, component } = gamesViewMap[gamesView];
+    const [showModal, setShowModal] = useState(false)
 
     return (
         <Box style={{
@@ -47,79 +71,77 @@ const Games = () => {
                 alignItems: "center",
             }}>
                 <Heading size="2xl" style={{ color: "#4D4D4D" }}>
-                    Places
+                    {title}
                 </Heading>
-                <Pressable>
-                    {({ pressed }) => (
-                        <Box style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            padding: 12,
-                            borderRadius: "50%",
-                            backgroundColor: pressed ? "#D4D4D4" : "transparent",
-                        }}>
-                            <SlidersHorizontal
-                                color={"#4D4D4D"}
-                                size={28}
-                            />
-                        </Box>
-
-                    )}
-                </Pressable>
-            </Box>
-            <ScrollView contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 100 }}>
-                <Box
-                    style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        flexWrap: 'wrap',
-                        justifyContent: 'space-between',
+                <Modal
+                    isOpen={showModal}
+                    onClose={() => {
+                        setShowModal(false)
                     }}
+                    size="md"
                 >
-                    {places.map((place) => {
-                        const { color, icon, text } = placesMap[place.attributes.name as PlaceType];
-
+                    <ModalBackdrop />
+                </Modal>
+                <Menu
+                    placement="bottom right"
+                    onOpen={() => setShowModal(true)}
+                    onClose={() => setShowModal(false)}
+                    style={{ width: 204 }}
+                    trigger={({ ...triggerProps }) => {
                         return (
-                            <Pressable
-                                key={place.id}
-                                style={{ width: '47%', marginBottom: 24 }}
-                                onPress={() => {
-                                    navigation.navigate('GamePlace', {
-                                        place: place.attributes.name,
-                                    });
-                                }}
-                            >
+                            <Pressable {...triggerProps}>
                                 {({ pressed }) => (
-                                    <Box
-                                        style={{
-                                            flexDirection: 'column',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            backgroundColor: color,
-                                            padding: 24,
-                                            borderRadius: 16,
-                                            gap: 12,
-                                            shadowColor: '#000',
-                                            shadowOffset: { width: 0, height: 2 },
-                                            shadowOpacity: 0.15,
-                                            shadowRadius: 4,
-                                            elevation: 4, // pro Android
-                                            borderWidth: 2,
-                                            borderColor: pressed ? "#4D4D4D" : "transparent",
-                                        }}
-                                    >
-                                        {icon}
-                                        <Text style={{ color: '#fff' }} size="lg">
-                                            {text}
-                                        </Text>
+                                    <Box style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        padding: 12,
+                                        borderRadius: "50%",
+                                        backgroundColor: pressed ? "#D4D4D4" : "transparent",
+                                    }}>
+                                        <MenuIcon
+                                            color={"#4D4D4D"}
+                                            size={28}
+                                        />
                                     </Box>
+
                                 )}
                             </Pressable>
-                        );
-                    })}
-                </Box>
-            </ScrollView>
+                        )
+                    }}
+                >
+                    <MenuItem onPress={() => {
+                        setGamesView(GamesView.ALL_GAMES);
+                    }} key="AllGames" textValue="a" style={{ paddingVertical: 8, paddingHorizontal: 12 }}>
+                        <Icon as={LayoutList} size="md" style={{ marginRight: 12, color: "#4D4D4D" }} />
+                        <MenuItemLabel size="lg" style={{ flexShrink: 1 }}>All Games</MenuItemLabel>
+                    </MenuItem>
+                    <MenuItem onPress={() => {
+                        setGamesView(GamesView.PLACES);
+                    }} key="Places" textValue="b" style={{ paddingVertical: 8, paddingHorizontal: 12 }}>
+                        <Icon as={LandPlot} size="md" style={{ marginRight: 12, color: "#4D4D4D" }} />
+                        <MenuItemLabel size="lg" style={{ flexShrink: 1 }}>Places</MenuItemLabel>
+                    </MenuItem>
+                    <MenuItem onPress={() => {
+                        setGamesView(GamesView.COLLECTIONS);
+                    }} key="Collections" textValue="c" style={{ paddingVertical: 8, paddingHorizontal: 12 }}>
+                        <Icon as={LibraryBig} size="md" style={{ marginRight: 12, color: "#4D4D4D" }} />
+                        <MenuItemLabel size="lg" style={{ flexShrink: 1 }}>Collections</MenuItemLabel>
+                    </MenuItem>
+                    <MenuSeparator />
+                    <MenuItem
+                        onPress={() => {
+                            navigation.navigate('CreateGame', {
+                                placeId: undefined,
+                            });
+                        }}
+                        key="AddGame" textValue="d" style={{ paddingVertical: 8, paddingHorizontal: 12 }}>
+                        <Icon as={Plus} size="md" style={{ marginRight: 12, color: "#4D4D4D" }} />
+                        <MenuItemLabel size="lg" style={{ flexShrink: 1 }}>Add Game</MenuItemLabel>
+                    </MenuItem>
+                </Menu>
+            </Box>
+            {component}
         </Box>
     )
 }

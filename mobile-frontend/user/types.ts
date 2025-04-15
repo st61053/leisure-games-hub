@@ -26,6 +26,16 @@ export interface ILoginData extends IApiObject {
     }
 }
 
+export interface IRegistrationData extends IApiObject {
+    attributes: {
+        username: string;
+        firstname: string;
+        lastname: string;
+        email: string;
+        password: string;
+    }
+}
+
 export interface IUserLoading {
     login: boolean;
     loggedUser: boolean;

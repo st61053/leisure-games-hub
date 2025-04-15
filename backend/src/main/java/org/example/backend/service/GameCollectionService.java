@@ -192,7 +192,8 @@ public class GameCollectionService {
 
         return new GameCollectionResponseDto(
                 collection.getName(),
-                games
+                games,
+                collection.getType().toString()
         );
     }
 

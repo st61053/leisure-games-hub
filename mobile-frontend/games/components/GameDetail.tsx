@@ -24,6 +24,10 @@ import { Input, InputField } from '@/components/ui/input';
 import { Controller, useForm } from 'react-hook-form';
 import { deleteGame } from '../api/deleteGame';
 import { getGame } from '../api/getGame';
+import { CollectionType } from '@/collections/types';
+import { addGameToCollection } from '@/collections/api/addGameToCollection';
+import { getCollections } from '@/collections/api/getCollections';
+import CollectionsActionSheet from '@/collections/components/CollectionsActionSheet';
 
 const GameDetail = () => {
 
@@ -38,6 +42,10 @@ const GameDetail = () => {
     const game = useAppSelector(getGameById(gameId));
     const categories = useAppSelector((state) => state.game.categories);
     const places = useAppSelector((state) => state.game.places);
+    const collections = useAppSelector((state) => state.collection.collections);
+
+    const favoriteCollection = collections.find((collection) => collection.attributes.type === CollectionType.FAVORITE);
+    const isGameInFavoriteCollection = favoriteCollection?.attributes.games.includes(gameId);
 
     const { name, favorites, duration, minPlayers, description, equipment } = game?.attributes ?? {};
 
@@ -49,6 +57,7 @@ const GameDetail = () => {
     const [showModal, setShowModal] = React.useState(false)
 
     const [showRemoveModal, setShowRemoveModal] = React.useState(false)
+    const [openCollectionActionsheet, setOpenCollectionActionsheet] = React.useState(false);
 
     useFocusEffect(
         useCallback(() => {
@@ -66,6 +75,17 @@ const GameDetail = () => {
             name: ""
         },
     })
+
+    const handleAddToCollection = async () => {
+        await dispatch(addGameToCollection({
+            collectionId: String(favoriteCollection?.id),
+            gameId: gameId,
+            method: isGameInFavoriteCollection ? "DELETE" : "POST"
+        }))
+
+        dispatch(getCollections());
+        dispatch(getGame(gameId));
+    }
 
     return (
         <Box>
@@ -85,7 +105,7 @@ const GameDetail = () => {
                     <Heading size="2xl" style={{ color: "#4D4D4D", flex: 1 }}>
                         {name && name.charAt(0).toUpperCase() + name.slice(1)}
                     </Heading>
-                    <Pressable>
+                    <Pressable onPress={() => handleAddToCollection()}>
                         {({ pressed }) => (
                             <Box style={{
                                 display: 'flex',
@@ -97,7 +117,7 @@ const GameDetail = () => {
                                 right: -16
                             }}>
                                 <Heart
-                                    fill={pressed ? "#4D4D4D" : "transparent"}
+                                    fill={isGameInFavoriteCollection ? "#4D4D4D" : "transparent"}
                                     color={"#4D4D4D"}
                                     size={28}
                                 />
@@ -159,7 +179,11 @@ const GameDetail = () => {
                             <MenuItemLabel size="lg" style={{ flexShrink: 1 }}>Delete</MenuItemLabel>
                         </MenuItem>
                         <MenuSeparator />
-                        <MenuItem key="collection" textValue="edit" style={{ paddingVertical: 8, paddingHorizontal: 12 }}>
+                        <MenuItem
+                            onPress={() => {
+                                setOpenCollectionActionsheet(true);
+                            }}
+                            key="collection" textValue="edit" style={{ paddingVertical: 8, paddingHorizontal: 12 }}>
                             <Icon as={Plus} size="md" style={{ marginRight: 12, color: "#4D4D4D" }} />
                             <MenuItemLabel size="lg" style={{ flexShrink: 1 }}>Add to collection</MenuItemLabel>
                         </MenuItem>
@@ -330,6 +354,13 @@ const GameDetail = () => {
                     </ModalFooter>
                 </ModalContent>
             </Modal>
+            <CollectionsActionSheet
+                isOpen={openCollectionActionsheet}
+                gameId={gameId}
+                onClose={() => {
+                    setOpenCollectionActionsheet(false)
+                    dispatch(getGame(gameId));
+                }} />
         </Box>
     )
 }
