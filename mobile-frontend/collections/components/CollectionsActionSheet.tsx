@@ -6,12 +6,14 @@ import { HStack } from "@/components/ui/hstack";
 import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
 import { Pressable } from "@/components/ui/pressable";
 import { VStack } from "@/components/ui/vstack"
-import { Plus, SearchIcon, Square, SquareCheckBig } from "lucide-react-native";
+import { Boxes, ChevronDown, Heart, Plus, SearchIcon, Square, SquareCheckBig } from "lucide-react-native";
 import { Keyboard, KeyboardAvoidingView, Platform, ScrollView, TouchableWithoutFeedback } from "react-native";
 import { Text } from "@/components/ui/text";
 import { addGameToCollection } from "../api/addGameToCollection";
 import { getCollections } from "../api/getCollections";
 import { getFilteredGames } from "@/games/api/getFilteredGames";
+import { CollectionType } from "../types";
+import { Button, ButtonText } from "@/components/ui/button";
 
 interface CollectionsActionSheetProps {
     isOpen: boolean;
@@ -94,11 +96,25 @@ const CollectionsActionSheet = ({ isOpen, gameId, onClose }: CollectionsActionSh
                                     <InputSlot style={{ paddingLeft: 16 }}>
                                         <InputIcon as={SearchIcon} />
                                     </InputSlot>
-                                    <InputField placeholder="Find collection..." />
+                                    <InputField placeholder="Search..." />
                                 </Input>
                             </Box>
+                            <HStack style={{ paddingHorizontal: 24 }} space="xl">
+                                <Button variant="link">
+                                    <ButtonText className="font-medium text-md text-typography-900">
+                                        Name
+                                    </ButtonText>
+                                    <ChevronDown color={"#4D4D4D"} size={18} />
+                                </Button>
+                                <Button variant="link">
+                                    <ButtonText className="font-medium text-md text-typography-900">
+                                        Games
+                                    </ButtonText>
+                                    {/* <ChevronDown color={"#4D4D4D"} size={18} /> */}
+                                </Button>
+                            </HStack>
                             <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
-                                <VStack space="xs" style={{ paddingTop: 8 }}>
+                                <VStack space="xs" style={{ paddingTop: 4 }}>
                                     {collections.map((collection) => {
 
                                         const isGameInCollection = collection.attributes.games.some((game) => game === gameId);
@@ -119,18 +135,31 @@ const CollectionsActionSheet = ({ isOpen, gameId, onClose }: CollectionsActionSh
                                                 }}
                                             >
                                                 {({ pressed }) => (
-                                                    <HStack style={{ backgroundColor: pressed ? "#E0E0E0" : "transparent", paddingVertical: 6, paddingHorizontal: 24, alignItems: "center" }}>
+                                                    <HStack space="md" style={{ backgroundColor: pressed ? "#E0E0E0" : "transparent", paddingVertical: 6, paddingHorizontal: 24, alignItems: "center" }}>
+                                                        <Box
+                                                            style={{
+                                                                backgroundColor: "#4D4D4D",
+                                                                padding: 10,
+                                                                borderRadius: 6,
+                                                                shadowColor: '#000',
+                                                                shadowOffset: { width: 0, height: 2 },
+                                                                shadowOpacity: 0.15,
+                                                                shadowRadius: 4,
+                                                                elevation: 4, // pro Android
+                                                            }}>
+                                                            {collection.attributes.type === CollectionType.FAVORITE ? <Heart color={"#fff"} size={24} /> : <Boxes color={"#fff"} size={28} />}
+                                                        </Box>
                                                         <VStack style={{ flex: 1 }}>
                                                             <Heading size="md" style={{ color: "#4D4D4D" }}>
                                                                 {collection.attributes.name}
                                                             </Heading>
-                                                            <Text size="sm" style={{ top: -2 }}>
+                                                            <Text size="sm" style={{ top: -4 }}>
                                                                 {`${gamesCount} ${gamesCount > 1 ? "games" : "game"}`}
                                                             </Text>
                                                         </VStack>
                                                         {isGameInCollection
-                                                            ? <SquareCheckBig size={20} color={"#4D4D4D"} />
-                                                            : <Square size={20} color={"#4D4D4D"} />
+                                                            ? <SquareCheckBig size={24} color={"#4D4D4D"} />
+                                                            : <Square size={24} color={"#4D4D4D"} />
                                                         }
                                                     </HStack>
                                                 )}

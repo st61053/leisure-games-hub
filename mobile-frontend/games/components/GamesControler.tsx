@@ -15,9 +15,10 @@ import GameList from "./GameList";
 
 interface GamesControllerProps {
     placeId?: string;
+    collectionId?: string;
 }
 
-const GamesController = ({ placeId }: GamesControllerProps) => {
+const GamesController = ({ placeId, collectionId }: GamesControllerProps) => {
 
     const dispatch = useAppDispatch();
 
@@ -28,6 +29,10 @@ const GamesController = ({ placeId }: GamesControllerProps) => {
 
     const fetchGames = () => {
         const filters = [
+            ...(collectionId ? [{
+                key: "collection",
+                value: collectionId
+            }] : []),
             ...(placeId ? [{
                 key: "place",
                 value: placeId

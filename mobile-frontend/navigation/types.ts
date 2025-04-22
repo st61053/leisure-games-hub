@@ -3,6 +3,9 @@ export type HomeStackParamList = {
     GamePlace: {
         place: string;
     };
+    GameCollection: {
+        collectionId: string;
+    };
     Game: {
         gameId: string;
     };
@@ -12,5 +15,11 @@ export type HomeStackParamList = {
     };
     EditGame: {
         gameId?: string;
+    };
+    CreateCollection: {
+        collectionId?: string;
+    };
+    EditCollection: {
+        collectionId?: string;
     };
 };

@@ -35,6 +35,11 @@ public class GameCollectionController {
         return ResponseEntity.ok(gameCollectionService.getAll());
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponseDto<GameCollectionResponseDto>> get(@PathVariable String id) {
+        return ResponseEntity.ok(gameCollectionService.get(id));
+    }
+
     @PostMapping("/{collectionId}/games/{gameId}")
     public ResponseEntity<ActionResponseDto> addGameToCollection(@PathVariable String collectionId, @PathVariable String gameId) {
         return gameCollectionService.addGameToCollection(collectionId, gameId);

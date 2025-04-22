@@ -5,7 +5,7 @@ import { Box } from "@/components/ui/box";
 import { Pressable } from "@/components/ui/pressable";
 import { Heading } from "@/components/ui/heading";
 import { getCategories } from "../api/getCategories";
-import { LandPlot, LayoutList, LibraryBig, MenuIcon, Plus } from "lucide-react-native";
+import { LandPlot, LibraryBig, List, MenuIcon, Plus } from "lucide-react-native";
 import { getCollections } from "@/collections/api/getCollections";
 import GamesViewPlaces from "./GamesViewPlaces";
 import GamesController from "./GamesControler";
@@ -15,13 +15,13 @@ import { Icon } from "@/components/ui/icon";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { HomeStackParamList } from "@/navigation/types";
 import { useNavigation } from "@react-navigation/native";
+import Collections from "@/collections/components/Collections";
 
 enum GamesView {
     PLACES = "places",
-    ALL_GAMES = "all_games",
+    OVERVIEW = "overview",
     COLLECTIONS = "collections",
 }
-
 
 const Games = () => {
 
@@ -36,20 +36,20 @@ const Games = () => {
         dispatch(getCollections());
     }, []);
 
-    const [gamesView, setGamesView] = useState<GamesView>(GamesView.ALL_GAMES);
+    const [gamesView, setGamesView] = useState<GamesView>(GamesView.OVERVIEW);
 
     const gamesViewMap = {
         [GamesView.PLACES]: {
             title: "Places",
             component: <GamesViewPlaces />,
         },
-        [GamesView.ALL_GAMES]: {
-            title: "All Games",
+        [GamesView.OVERVIEW]: {
+            title: "Overview",
             component: <GamesController />,
         },
         [GamesView.COLLECTIONS]: {
             title: "Collections",
-            component: <GamesViewPlaces />,
+            component: <Collections />,
         }
     }
 
@@ -69,6 +69,8 @@ const Games = () => {
                 flexDirection: 'row',
                 justifyContent: "space-between",
                 alignItems: "center",
+                zIndex: 1,
+                backgroundColor: "#f2f2f2",
             }}>
                 <Heading size="2xl" style={{ color: "#4D4D4D" }}>
                     {title}
@@ -111,10 +113,10 @@ const Games = () => {
                     }}
                 >
                     <MenuItem onPress={() => {
-                        setGamesView(GamesView.ALL_GAMES);
+                        setGamesView(GamesView.OVERVIEW);
                     }} key="AllGames" textValue="a" style={{ paddingVertical: 8, paddingHorizontal: 12 }}>
-                        <Icon as={LayoutList} size="md" style={{ marginRight: 12, color: "#4D4D4D" }} />
-                        <MenuItemLabel size="lg" style={{ flexShrink: 1 }}>All Games</MenuItemLabel>
+                        <Icon as={List} size="md" style={{ marginRight: 12, color: "#4D4D4D" }} />
+                        <MenuItemLabel size="lg" style={{ flexShrink: 1 }}>Overview</MenuItemLabel>
                     </MenuItem>
                     <MenuItem onPress={() => {
                         setGamesView(GamesView.PLACES);
@@ -137,7 +139,17 @@ const Games = () => {
                         }}
                         key="AddGame" textValue="d" style={{ paddingVertical: 8, paddingHorizontal: 12 }}>
                         <Icon as={Plus} size="md" style={{ marginRight: 12, color: "#4D4D4D" }} />
-                        <MenuItemLabel size="lg" style={{ flexShrink: 1 }}>Add Game</MenuItemLabel>
+                        <MenuItemLabel size="lg" style={{ flexShrink: 1 }}>Add game</MenuItemLabel>
+                    </MenuItem>
+                    <MenuItem
+                        onPress={() => {
+                            navigation.navigate('CreateCollection', {
+                                collectionId: undefined,
+                            });
+                        }}
+                        key="AddCollection" textValue="d" style={{ paddingVertical: 8, paddingHorizontal: 12 }}>
+                        <Icon as={Plus} size="md" style={{ marginRight: 12, color: "#4D4D4D" }} />
+                        <MenuItemLabel size="lg" style={{ flexShrink: 1 }}>Add collection</MenuItemLabel>
                     </MenuItem>
                 </Menu>
             </Box>

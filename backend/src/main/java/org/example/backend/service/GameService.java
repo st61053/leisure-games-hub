@@ -15,6 +15,7 @@ import java.util.ArrayList;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,6 +26,7 @@ public class GameService {
     private final UserRepository userRepository;
     private final GameCategoryRepository gameCategoryRepository;
     private final PlaceRepository placeRepository;
+    private final GameCollectionRepository gameCollectionRepository;
 
     public ResponseEntity<ActionResponseDto> create(GameRequestDto request) {
 
@@ -120,6 +122,8 @@ public class GameService {
 
 
     public ResponseEntity<ActionResponseDto> delete(String id) {
+
+        gameCollectionRepository.removeGameFromAllCollections(id);
         gameRepository.deleteById(id);
 
         ActionResultDto result = new ActionResultDto(
@@ -143,9 +147,27 @@ public class GameService {
         return new ApiResponseDto<>(data);
     }
 
-    public ApiResponseDto<GameShortResponseDto> filterGames(String place, List<String> categories, String name) {
-        List<Game> games = gameRepository.findAll();
+    public ApiResponseDto<GameShortResponseDto> filterGames(
+            String place,
+            List<String> categories,
+            String name,
+            String collectionId
+    ) {
+        List<Game> games;
 
+        // Pokud je zadáno ID kolekce, načti hry z kolekce
+        if (collectionId != null) {
+            Optional<GameCollection> collectionOpt = gameCollectionRepository.findById(collectionId);
+            if (collectionOpt.isEmpty()) {
+                // Pokud kolekce neexistuje, vrať prázdnou odpověď
+                return new ApiResponseDto<>(List.of());
+            }
+            games = collectionOpt.get().getGames();
+        } else {
+            games = gameRepository.findAll();
+        }
+
+        // Filtruj hry podle ostatních parametrů
         List<Game> filtered = games.stream()
                 .filter(game -> place == null || game.getPlace().getId().equals(place))
                 .filter(game -> {
@@ -164,6 +186,7 @@ public class GameService {
 
         return new ApiResponseDto<>(response);
     }
+
 
     private GameResponseDto mapToResponse(Game game) {
         List<String> categoryNames = game.getCategories().stream()

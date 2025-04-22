@@ -11,6 +11,9 @@ import { createPlacesMap } from '@/games/constants';
 import GameDetail from '@/games/components/GameDetail';
 import { Ionicons } from '@expo/vector-icons';
 import GameEditor from '@/games/components/GameEditor';
+import GameCollectionList from '@/games/components/GameCollectionList';
+import CollectionEditor from '@/collections/components/CollectionEditor';
+// import CollectionEditor from '@/collections/components/CollectionEditor';
 
 const Stack = createNativeStackNavigator<HomeStackParamList>();
 
@@ -42,6 +45,27 @@ const HomeStackNavigator = () => {
                 options={({ navigation }) => {
                     return {
                         title: "Place",
+                        headerLeft: () => (
+                            <TouchableOpacity
+                                onPress={() => navigation.goBack()}
+                                style={{ paddingHorizontal: 4 }}
+                            >
+                                <Icon
+                                    size="xl"
+                                    as={ChevronLeft}
+                                    style={{ color: '#4D4D4D' }}
+                                />
+                            </TouchableOpacity>
+                        ),
+                    };
+                }}
+            />
+            <Stack.Screen
+                name="GameCollection"
+                component={GameCollectionList}
+                options={({ navigation }) => {
+                    return {
+                        title: "Collection",
                         headerLeft: () => (
                             <TouchableOpacity
                                 onPress={() => navigation.goBack()}
@@ -105,6 +129,48 @@ const HomeStackNavigator = () => {
                 options={({ navigation }) => {
                     return {
                         title: "Edit Game",
+                        headerLeft: () => (
+                            <TouchableOpacity
+                                onPress={() => navigation.goBack()}
+                                style={{ paddingHorizontal: 4 }}
+                            >
+                                <Icon
+                                    size="xl"
+                                    as={ChevronLeft}
+                                    style={{ color: '#4D4D4D' }}
+                                />
+                            </TouchableOpacity>
+                        ),
+                    };
+                }}
+            />
+            <Stack.Screen
+                name="CreateCollection"
+                component={CollectionEditor}
+                options={({ navigation }) => {
+                    return {
+                        title: "Create Collection",
+                        headerLeft: () => (
+                            <TouchableOpacity
+                                onPress={() => navigation.goBack()}
+                                style={{ paddingHorizontal: 4 }}
+                            >
+                                <Icon
+                                    size="xl"
+                                    as={ChevronLeft}
+                                    style={{ color: '#4D4D4D' }}
+                                />
+                            </TouchableOpacity>
+                        ),
+                    };
+                }}
+            />
+            <Stack.Screen
+                name="EditCollection"
+                component={CollectionEditor}
+                options={({ navigation }) => {
+                    return {
+                        title: "Edit Collection",
                         headerLeft: () => (
                             <TouchableOpacity
                                 onPress={() => navigation.goBack()}

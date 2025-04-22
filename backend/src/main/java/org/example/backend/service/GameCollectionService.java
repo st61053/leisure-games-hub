@@ -17,6 +17,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -203,5 +204,11 @@ public class GameCollectionService {
         favorite.setType(GameCollectionType.FAVORITE);
         favorite.setOwner(user);
         collectionRepository.save(favorite);
+    }
+
+    public ApiResponseDto<GameCollectionResponseDto> get(String id) {
+        GameCollection gameCollection = collectionRepository.findById(id).orElseThrow(() -> new RuntimeException("Not found"));
+        ApiData<GameCollectionResponseDto> dataItem = new ApiData<>(gameCollection.getId(), ApiResourceType.COLLECTION.getValue(), mapToResponse(gameCollection));
+        return new ApiResponseDto<>(List.of(dataItem));
     }
 }

@@ -46,9 +46,10 @@ public class GameController {
     public ResponseEntity<ApiResponseDto<GameShortResponseDto>> filterGames(
             @RequestParam(required = false) String place,
             @RequestParam(required = false) List<String> categories,
-            @RequestParam(required = false) String name
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String collection
     ) {
-        return ResponseEntity.ok(gameService.filterGames(place, categories, name));
+        return ResponseEntity.ok(gameService.filterGames(place, categories, name, collection));
     }
 }
 
