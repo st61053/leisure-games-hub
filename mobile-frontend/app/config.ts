@@ -1,5 +1,5 @@
 
-export const SERVER_URL = 'http://10.221.101.186:9090/api/v1';
+export const SERVER_URL = 'http://192.168.1.104:9090/api/v1';
 
 type HttpMethod = "GET" | "POST" | "PUT" | "DELETE";
 

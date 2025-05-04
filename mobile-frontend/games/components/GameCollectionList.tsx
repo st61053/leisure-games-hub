@@ -58,18 +58,22 @@ const GameCollectionList = () => {
 
     return (
         <Box style={{
-            paddingVertical: 20,
             paddingBottom: 12,
             display: 'flex',
             flexDirection: 'column',
+            backgroundColor: "#FDFDFD",
+            height: '100%',
         }}>
             <Box style={{
+                paddingTop: 20,
                 paddingHorizontal: 24,
                 paddingRight: 12,
                 display: 'flex',
                 flexDirection: 'row',
                 justifyContent: "space-between",
                 alignItems: "center",
+                zIndex: 1,
+                backgroundColor: "#FDFDFD",
             }}>
                 <Heading size="2xl" style={{ color: "#4D4D4D" }}>
                     {collection?.attributes.name}

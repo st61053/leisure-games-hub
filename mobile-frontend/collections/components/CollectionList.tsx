@@ -1,8 +1,11 @@
-import { ScrollView } from "react-native";
-import { ICollection } from "../types"
-import { VStack } from "@/components/ui/vstack";
-import { Spinner } from "@/components/ui/spinner";
-import CollectionItem from "./CollectionItem";
+import { CollectionType, ICollection } from "../types"
+import { Item } from "@/components/shared/Item";
+import { Boxes, EllipsisVertical, Heart } from "lucide-react-native";
+import { Text } from "@/components/ui/text";
+import { HomeStackParamList } from "@/navigation/types";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { FlatItemList } from "@/components/shared/FlatItemList";
 
 interface CollectionListProps {
     collections: ICollection[];
@@ -11,12 +14,36 @@ interface CollectionListProps {
 
 const CollectionList = ({ collections, loading }: CollectionListProps) => {
 
+    type NavigationProp = NativeStackNavigationProp<HomeStackParamList, 'Games'>;
+    const navigation = useNavigation<NavigationProp>();
+
     return (
-        <ScrollView contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 300 }}>
-            <VStack space="sm">
-                {loading ? <Spinner /> : collections.map((collection) => <CollectionItem key={collection.id} collection={collection} />)}
-            </VStack>
-        </ScrollView>
+
+        <FlatItemList
+            items={collections}
+            loading={loading}
+            emptyMessage="No collections found."
+            renderItem={({ item: collection }) => {
+
+                const { name, games, type } = collection.attributes;
+
+                return (
+                    <Item
+                        color={"#4D4D4D"}
+                        title={name}
+                        leftSlot={type === CollectionType.FAVORITE ? <Heart color={"#fff"} size={28} /> : <Boxes color={"#fff"} size={28} />}
+                        meta={
+                            <Text style={{ color: "#6D6D6D", top: -2 }}>{`${games.length} ${games.length > 1 ? "games" : "game"}`}</Text>
+                        }
+                        onPress={() => navigation.navigate('GameCollection', {
+                            collectionId: collection.id
+                        })}
+                        rightSlot={<EllipsisVertical size={24} color="#4D4D4D" />}
+
+                    />
+                );
+            }}
+        />
     )
 }
 
