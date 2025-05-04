@@ -1,7 +1,7 @@
 import { useFocusEffect } from "@react-navigation/native";
 import { useAppDispatch, useAppSelector } from "@/app/hooks";
 import { RootState } from "@/app/store";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { getFilteredGames } from "../api/getFilteredGames";
 import GameList from "./GameList";
 import { ListScreenLayout } from "@/components/shared/ListScreenLayout";
@@ -17,26 +17,36 @@ const GamesController = ({ placeId, collectionId }: GamesControllerProps) => {
     const categories = useAppSelector((state: RootState) => state.game.categories);
     const games = useAppSelector((state: RootState) => state.game.games);
 
-    const fetchGames = () => {
-        const filters = [
-            ...(collectionId ? [{ key: "collection", value: collectionId }] : []),
-            ...(placeId ? [{ key: "place", value: placeId }] : []),
-            ...categories
-                .filter((category) => category.attributes.active)
-                .map((category) => ({
-                    key: "categories",
-                    value: category.id
-                }))
-        ];
+    const [refreshing, setRefreshing] = useState(false);
 
-        dispatch(getFilteredGames(filters));
-    };
+    const getFilters = () => [
+        ...(collectionId ? [{ key: "collection", value: collectionId }] : []),
+        ...(placeId ? [{ key: "place", value: placeId }] : []),
+        ...categories
+            .filter((category) => category.attributes.active)
+            .map((category) => ({
+                key: "categories",
+                value: category.id
+            }))
+    ];
+
+    const fetchGames = useCallback(async () => {
+        const filters = getFilters();
+        await dispatch(getFilteredGames(filters));
+    }, [placeId, collectionId, categories]);
 
     useFocusEffect(
         useCallback(() => {
             fetchGames();
-        }, [placeId, categories])
+        }, [fetchGames])
     );
+
+    const handleRefresh = async () => {
+        if (refreshing) return;
+        setRefreshing(true);
+        await fetchGames(); // ✅ musíš počkat
+        setRefreshing(false);
+    };
 
     return (
         <ListScreenLayout
@@ -48,7 +58,7 @@ const GamesController = ({ placeId, collectionId }: GamesControllerProps) => {
                 />
             )}
         >
-            <GameList />
+            <GameList refreshing={refreshing} onRefresh={handleRefresh} />
         </ListScreenLayout>
     );
 };

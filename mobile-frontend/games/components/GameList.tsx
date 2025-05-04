@@ -14,7 +14,12 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { HomeStackParamList } from "@/navigation/types";
 import { FlatItemList } from "@/components/shared/FlatItemList";
 
-const GamesList = () => {
+interface GamesListProps {
+    onRefresh?: () => void;
+    refreshing?: boolean;
+}
+
+const GamesList = ({ onRefresh, refreshing }: GamesListProps) => {
 
     type NavigationProp = NativeStackNavigationProp<HomeStackParamList, 'Games'>;
     const navigation = useNavigation<NavigationProp>();
@@ -32,6 +37,8 @@ const GamesList = () => {
     return (
         <>
             <FlatItemList
+                refreshing={refreshing}
+                onRefresh={onRefresh}
                 items={games}
                 loading={loading}
                 emptyMessage="Nothing to play here!"

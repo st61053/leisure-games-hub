@@ -1,5 +1,5 @@
 import Animated from "react-native-reanimated";
-import { ListRenderItem } from "react-native";
+import { ListRenderItem, RefreshControl } from "react-native";
 import { Spinner } from "@/components/ui/spinner";
 import { VStack } from "@/components/ui/vstack";
 import { HStack } from "@/components/ui/hstack";
@@ -16,6 +16,8 @@ interface FlatItemListProps<T> {
     emptyMessage?: string;
     keyExtractor?: (item: T, index: number) => string;
     showDividers?: boolean;
+    onRefresh?: () => void;              // ✅ nový prop
+    refreshing?: boolean;
 }
 
 export const FlatItemList = <T,>({
@@ -25,13 +27,17 @@ export const FlatItemList = <T,>({
     emptyMessage = "Nothing to show here.",
     keyExtractor = (item, index) => (item as any).id?.toString() ?? index.toString(),
     showDividers = true,
+    refreshing,
+    onRefresh
 }: FlatItemListProps<T>) => {
     const scrollProps = useScrollProps();
 
-    if (loading) return <Spinner />;
+    if (loading && !refreshing) return <Spinner />;
 
     return (
         <Animated.FlatList
+            refreshing={refreshing}
+            onRefresh={onRefresh}
             data={items}
             renderItem={renderItem}
             keyExtractor={keyExtractor}
@@ -46,6 +52,13 @@ export const FlatItemList = <T,>({
                 </HStack>
             }
             {...scrollProps}
+            refreshControl={
+                <RefreshControl
+                    refreshing={refreshing ?? false}
+                    onRefresh={onRefresh}
+                    progressViewOffset={60}
+                />
+            }
         />
     );
 };
