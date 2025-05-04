@@ -50,16 +50,18 @@ const CollectionsActionSheet = ({ isOpen, gameId, onClose }: CollectionsActionSh
             behavior={Platform.OS === "ios" ? "padding" : undefined}
         >
             <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-                <Actionsheet isOpen={isOpen} onClose={() => {
-                    onClose();
-                    // fetchGames();
-                }}>
+                <Actionsheet
+                    isOpen={isOpen}
+                    onClose={() => {
+                        onClose();
+                        // fetchGames();
+                    }}>
                     <ActionsheetBackdrop />
                     <ActionsheetContent style={{ paddingHorizontal: 0 }}>
                         <ActionsheetDragIndicatorWrapper>
                             <ActionsheetDragIndicator />
                         </ActionsheetDragIndicatorWrapper>
-                        <VStack style={{ width: "100%", minHeight: 400 }} space="xs">
+                        <VStack style={{ width: "100%", minHeight: 400, maxHeight: 600 }} space="xs">
                             <HStack style={{ alignItems: "center", paddingHorizontal: 20 }}>
                                 <Heading size="lg" style={{ color: "#4D4D4D", flex: 1, paddingLeft: 2 }}>
                                     Add to collection

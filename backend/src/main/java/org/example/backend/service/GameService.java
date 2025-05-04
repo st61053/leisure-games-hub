@@ -5,19 +5,17 @@ import org.example.backend.component.ApiData;
 import org.example.backend.component.ApiResourceType;
 import org.example.backend.dto.*;
 import org.example.backend.entity.*;
-import org.example.backend.enums.GameCollectionType;
 import org.example.backend.repository.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import java.util.ArrayList;
+import lombok.extern.slf4j.Slf4j;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class GameService {
@@ -28,20 +26,24 @@ public class GameService {
     private final PlaceRepository placeRepository;
     private final GameCollectionRepository gameCollectionRepository;
 
-    public ResponseEntity<ActionResponseDto> create(GameRequestDto request) {
-
+    private User getAuthenticatedUser() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-
-        User createdBy = userRepository.findByUsername(username)
+        return userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
+    }
 
-        Place place = placeRepository.findById(request.place())
-                .orElseThrow(() -> new RuntimeException("Place not found"));
-
-        List<GameCategory> categories = request.categories().stream()
+    private List<GameCategory> loadCategoriesByIds(List<String> categoryIds) {
+        return categoryIds.stream()
                 .map(catId -> gameCategoryRepository.findById(catId)
                         .orElseThrow(() -> new RuntimeException("Category not found: " + catId)))
-                .collect(Collectors.toCollection(ArrayList::new));
+                .collect(Collectors.toList());
+    }
+
+    public ResponseEntity<ActionResponseDto> create(GameRequestDto request) {
+        User createdBy = getAuthenticatedUser();
+        Place place = placeRepository.findById(request.place())
+                .orElseThrow(() -> new RuntimeException("Place not found"));
+        List<GameCategory> categories = loadCategoriesByIds(request.categories());
 
         Game game = new Game();
         game.setName(request.name());
@@ -55,51 +57,29 @@ public class GameService {
         game.setAuthor(request.author());
 
         gameRepository.save(game);
+        log.info("Creating new game: {}", request.name());
 
-        ActionResultDto result = new ActionResultDto(
-                game.getId(),
-                "success",
-                "GAME_CREATED"
-        );
 
-        return ResponseEntity.ok(new ActionResponseDto(List.of(result)));
-    }
-
-    public ApiResponseDto<GameResponseDto> get(String id) {
-        Game game = gameRepository.findById(id).orElseThrow(() -> new RuntimeException("Not found"));
-        ApiData<GameResponseDto> dataItem = new ApiData<>(game.getId(), ApiResourceType.GAME.getValue(), mapToResponse(game));
-        return new ApiResponseDto<>(List.of(dataItem));
+        return buildActionResponse(game.getId(), "GAME_CREATED");
     }
 
     public ResponseEntity<ActionResponseDto> update(String id, GameRequestDto request) {
         Game game = gameRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Game not found"));
 
-        // Přihlášený uživatel
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        User currentUser = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Current user not found"));
-
-        // Je admin?
+        User currentUser = getAuthenticatedUser();
         boolean isAdmin = currentUser.getRoles().stream()
                 .anyMatch(role -> role.getName().equalsIgnoreCase("ADMIN"));
-
-        // Je původní autor hry?
         boolean isAuthor = game.getCreatedBy().getId().equals(currentUser.getId());
 
         if (!isAdmin && !isAuthor) {
             throw new AccessDeniedException("You are not allowed to update this game.");
         }
 
-        List<GameCategory> categories = request.categories().stream()
-                .map(catId -> gameCategoryRepository.findById(catId)
-                        .orElseThrow(() -> new RuntimeException("Category not found: " + catId)))
-                .collect(Collectors.toCollection(ArrayList::new));
-
+        List<GameCategory> categories = loadCategoriesByIds(request.categories());
         Place place = placeRepository.findById(request.place())
                 .orElseThrow(() -> new RuntimeException("Place not found"));
 
-        // Aktualizace hry
         game.setName(request.name());
         game.setDescription(request.description());
         game.setPlace(place);
@@ -107,32 +87,33 @@ public class GameService {
         game.setDuration(request.duration());
         game.setMinPlayers(request.minPlayers());
         game.setEquipment(request.equipment());
-        game.setAuthor(request.author()); // může být i jiný autor
+        game.setAuthor(request.author());
 
         gameRepository.save(game);
+        log.info("User {} updating game {}", currentUser.getUsername(), id);
 
-        ActionResultDto result = new ActionResultDto(
-                game.getId(),
-                "success",
-                "GAME_UPDATED"
-        );
-
-        return ResponseEntity.ok(new ActionResponseDto(List.of(result)));
+        return buildActionResponse(game.getId(), "GAME_UPDATED");
     }
 
-
     public ResponseEntity<ActionResponseDto> delete(String id) {
-
         gameCollectionRepository.removeGameFromAllCollections(id);
         gameRepository.deleteById(id);
+        log.warn("Deleting game with ID: {}", id);
 
-        ActionResultDto result = new ActionResultDto(
-                id,
-                "success",
-                "GAME_DELETED"
+        return buildActionResponse(id, "GAME_DELETED");
+    }
+
+    public ApiResponseDto<GameResponseDto> get(String id) {
+        Game game = gameRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Game not found"));
+
+        ApiData<GameResponseDto> data = new ApiData<>(
+                game.getId(),
+                ApiResourceType.GAME.getValue(),
+                mapToResponse(game)
         );
 
-        return ResponseEntity.ok(new ActionResponseDto(List.of(result)));
+        return new ApiResponseDto<>(List.of(data));
     }
 
     public ApiResponseDto<GameShortResponseDto> getAll() {
@@ -155,41 +136,44 @@ public class GameService {
     ) {
         List<Game> games;
 
-        // Pokud je zadáno ID kolekce, načti hry z kolekce
         if (collectionId != null) {
-            Optional<GameCollection> collectionOpt = gameCollectionRepository.findById(collectionId);
-            if (collectionOpt.isEmpty()) {
-                // Pokud kolekce neexistuje, vrať prázdnou odpověď
+            GameCollection collection = gameCollectionRepository.findById(collectionId)
+                    .orElse(null);
+
+            if (collection == null) {
                 return new ApiResponseDto<>(List.of());
             }
-            games = collectionOpt.get().getGames();
+
+            games = collection.getGames();
         } else {
             games = gameRepository.findAll();
         }
 
-        // Filtruj hry podle ostatních parametrů
         List<Game> filtered = games.stream()
                 .filter(game -> place == null || game.getPlace().getId().equals(place))
                 .filter(game -> {
                     if (categories == null || categories.isEmpty()) return true;
-                    List<String> gameCategoryIds = game.getCategories().stream()
+                    Set<String> gameCategoryIds = game.getCategories().stream()
                             .map(GameCategory::getId)
-                            .toList();
-                    return new HashSet<>(gameCategoryIds).containsAll(categories);
+                            .collect(Collectors.toSet());
+                    return gameCategoryIds.containsAll(categories);
                 })
                 .filter(game -> name == null || game.getName().toLowerCase().contains(name.toLowerCase()))
                 .toList();
 
         List<ApiData<GameShortResponseDto>> response = filtered.stream()
-                .map(game -> new ApiData<>(game.getId(), ApiResourceType.GAME.getValue(), mapToShortResponse(game)))
+                .map(game -> new ApiData<>(
+                        game.getId(),
+                        ApiResourceType.GAME.getValue(),
+                        mapToShortResponse(game)
+                ))
                 .toList();
 
         return new ApiResponseDto<>(response);
     }
 
-
     private GameResponseDto mapToResponse(Game game) {
-        List<String> categoryNames = game.getCategories().stream()
+        List<String> categoryIds = game.getCategories().stream()
                 .map(GameCategory::getId)
                 .toList();
 
@@ -197,7 +181,7 @@ public class GameService {
                 game.getName(),
                 game.getDescription(),
                 game.getPlace().getId(),
-                categoryNames,
+                categoryIds,
                 game.getDuration(),
                 game.getMinPlayers(),
                 game.getEquipment(),
@@ -210,14 +194,14 @@ public class GameService {
     }
 
     private GameShortResponseDto mapToShortResponse(Game game) {
-        List<String> categoryNames = game.getCategories().stream()
+        List<String> categoryIds = game.getCategories().stream()
                 .map(GameCategory::getId)
                 .toList();
 
         return new GameShortResponseDto(
                 game.getName(),
                 game.getPlace().getId(),
-                categoryNames,
+                categoryIds,
                 game.getDuration(),
                 game.getMinPlayers(),
                 game.getAuthor(),
@@ -227,5 +211,9 @@ public class GameService {
                 game.getFavorites()
         );
     }
-}
 
+    private ResponseEntity<ActionResponseDto> buildActionResponse(String id, String message) {
+        ActionResultDto result = new ActionResultDto(id, "success", message);
+        return ResponseEntity.ok(new ActionResponseDto(List.of(result)));
+    }
+}

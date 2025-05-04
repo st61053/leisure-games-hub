@@ -5,6 +5,7 @@ import org.example.backend.component.ApiData;
 import org.example.backend.component.ApiResourceType;
 import org.example.backend.dto.ApiResponseDto;
 import org.example.backend.dto.GameCategoryResponseDto;
+import org.example.backend.entity.GameCategory;
 import org.example.backend.repository.GameCategoryRepository;
 import org.springframework.stereotype.Service;
 
@@ -18,15 +19,14 @@ public class GameCategoryService {
 
     public ApiResponseDto<GameCategoryResponseDto> getAll() {
         List<ApiData<GameCategoryResponseDto>> data = gameCategoryRepository.findAll().stream()
-                .map(gameCategory -> new ApiData<>(
-                        gameCategory.getId(),
-                        ApiResourceType.CATEGORY.getValue(),
-                        new GameCategoryResponseDto(
-                                gameCategory.getName()
-                        )
-                ))
+                .map(this::mapToApiData)
                 .toList();
 
         return new ApiResponseDto<>(data);
+    }
+
+    private ApiData<GameCategoryResponseDto> mapToApiData(GameCategory category) {
+        GameCategoryResponseDto dto = new GameCategoryResponseDto(category.getName());
+        return new ApiData<>(category.getId(), ApiResourceType.CATEGORY.getValue(), dto);
     }
 }

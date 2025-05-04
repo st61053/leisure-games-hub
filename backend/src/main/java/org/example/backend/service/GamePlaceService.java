@@ -5,6 +5,7 @@ import org.example.backend.component.ApiData;
 import org.example.backend.component.ApiResourceType;
 import org.example.backend.dto.ApiResponseDto;
 import org.example.backend.dto.GamePlaceResponseDto;
+import org.example.backend.entity.Place;
 import org.example.backend.repository.PlaceRepository;
 import org.springframework.stereotype.Service;
 
@@ -18,15 +19,14 @@ public class GamePlaceService {
 
     public ApiResponseDto<GamePlaceResponseDto> getAll() {
         List<ApiData<GamePlaceResponseDto>> data = placeRepository.findAll().stream()
-                .map(gamePlace -> new ApiData<>(
-                        gamePlace.getId(),
-                        ApiResourceType.PLACE.getValue(),
-                        new GamePlaceResponseDto(
-                                gamePlace.getName()
-                        )
-                ))
+                .map(this::mapToApiData)
                 .toList();
 
         return new ApiResponseDto<>(data);
+    }
+
+    private ApiData<GamePlaceResponseDto> mapToApiData(Place place) {
+        GamePlaceResponseDto dto = new GamePlaceResponseDto(place.getName());
+        return new ApiData<>(place.getId(), ApiResourceType.PLACE.getValue(), dto);
     }
 }

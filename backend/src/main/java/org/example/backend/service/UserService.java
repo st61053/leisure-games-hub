@@ -5,7 +5,6 @@ import org.example.backend.component.ApiData;
 import org.example.backend.component.ApiResourceType;
 import org.example.backend.dto.ApiResponseDto;
 import org.example.backend.dto.UserResponseDto;
-import org.example.backend.entity.GameCollection;
 import org.example.backend.entity.User;
 import org.example.backend.repository.UserRepository;
 import org.springframework.http.HttpStatus;
@@ -24,40 +23,32 @@ public class UserService {
 
     public ApiResponseDto<UserResponseDto> getAll() {
         List<ApiData<UserResponseDto>> data = userRepository.findAll().stream()
-                .map(user -> new ApiData<>(
-                        user.getId(),
-                        ApiResourceType.USER.getValue(),
-                        new UserResponseDto(
-                                user.getUsername(),
-                                user.getEmail(),
-                                user.getFirstname(),
-                                user.getLastname()
-                        )
-                ))
+                .map(this::mapToApiData)
                 .toList();
 
         return new ApiResponseDto<>(data);
     }
 
     public ApiResponseDto<UserResponseDto> get(String id) {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        userRepository.findByUsername(username).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not authenticated"));
 
-        User responseUser = userRepository.findById(id).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
-        List<ApiData<UserResponseDto>> data = List.of(new ApiData<>(
-                responseUser.getId(),
-                ApiResourceType.USER.getValue(),
-                new UserResponseDto(
-                        responseUser.getUsername(),
-                        responseUser.getEmail(),
-                        responseUser.getFirstname(),
-                        responseUser.getLastname()
-                )
-        ));
+        String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (!user.getUsername().equals(currentUsername)) {
+            throw new AccessDeniedException("Access denied");
+        }
 
-        return new ApiResponseDto<>(data);
+        return new ApiResponseDto<>(List.of(mapToApiData(user)));
+    }
+
+    private ApiData<UserResponseDto> mapToApiData(User user) {
+        UserResponseDto dto = new UserResponseDto(
+                user.getUsername(),
+                user.getEmail(),
+                user.getFirstname(),
+                user.getLastname()
+        );
+        return new ApiData<>(user.getId(), ApiResourceType.USER.getValue(), dto);
     }
 }

@@ -59,6 +59,7 @@ const Games = () => {
     return (
         <Box style={{
             height: '100%',
+            backgroundColor: "#FDFDFD",
         }}>
             <Box style={{
                 paddingHorizontal: 24,
@@ -70,7 +71,7 @@ const Games = () => {
                 justifyContent: "space-between",
                 alignItems: "center",
                 zIndex: 1,
-                backgroundColor: "#f2f2f2",
+                backgroundColor: "#FDFDFD",
             }}>
                 <Heading size="2xl" style={{ color: "#4D4D4D" }}>
                     {title}

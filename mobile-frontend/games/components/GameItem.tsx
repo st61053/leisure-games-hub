@@ -25,7 +25,7 @@ const GameItem = ({ game }: GameItemProps) => {
     const places = useAppSelector((state) => state.game.places);
     const placeName = places.find((p) => p.id === game.attributes.place)?.attributes.name;
 
-    const placesMap = createPlacesMap(24);
+    const placesMap = createPlacesMap(32);
     const { color, icon } = placesMap[placeName as PlaceType];
     const { name, favorites, duration, minPlayers } = game.attributes;
 
@@ -51,12 +51,13 @@ const GameItem = ({ game }: GameItemProps) => {
                 {({ pressed }) => (
                     <HStack
                         style={{
-                            backgroundColor: "#fff",
-                            padding: 12,
-                            borderRadius: 12,
-                            gap: 12,
-                            borderWidth: 1,
-                            borderColor: pressed ? "#4D4D4D" : "#D4D4D4",
+                            // backgroundColor: "#fff",
+                            padding: 16,
+                            paddingHorizontal: 24,
+                            // borderRadius: 12,
+                            gap: 16,
+                            // borderWidth: 1,
+                            // borderColor: pressed ? "#4D4D4D" : "#D4D4D4",
                         }}
                     >
                         <Box
@@ -72,7 +73,7 @@ const GameItem = ({ game }: GameItemProps) => {
                             }}>
                             {icon}
                         </Box>
-                        <VStack style={{ flex: 1 }}>
+                        <VStack style={{ flex: 1 }} space='xs'>
                             <Heading size="lg">
                                 {name}
                             </Heading>
@@ -105,11 +106,11 @@ const GameItem = ({ game }: GameItemProps) => {
                                     padding: 12,
                                     borderRadius: "50%",
                                     backgroundColor: pressed ? "#D4D4D4" : "transparent",
-                                    right: -8
+                                    right: -16
                                 }}>
                                     <EllipsisVertical
                                         color={"#4D4D4D"}
-                                        size={24}
+                                        size={28}
                                     />
                                 </Box>
 
