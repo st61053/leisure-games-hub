@@ -16,6 +16,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { HomeStackParamList } from "@/navigation/types";
 import { useNavigation } from "@react-navigation/native";
 import Collections from "@/collections/components/Collections";
+import { getUsers } from "@/user/api/getUsers";
 
 enum GamesView {
     PLACES = "places",
@@ -34,6 +35,7 @@ const Games = () => {
         dispatch(getPlaces());
         dispatch(getCategories());
         dispatch(getCollections());
+        dispatch(getUsers());
     }, []);
 
     const [gamesView, setGamesView] = useState<GamesView>(GamesView.OVERVIEW);

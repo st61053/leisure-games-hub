@@ -4,6 +4,7 @@ import { IUser, IUserState } from './types'
 import { ILoginResponse, loginUser } from './api/loginUser'
 import { ApiObjectType } from '../app/config'
 import { getUser } from './api/getUser'
+import { getUsers } from './api/getUsers'
 
 const initialState: IUserState = {
     jwt: undefined,
@@ -75,6 +76,10 @@ export const userSlice = createSlice({
             .addCase(getUser.rejected, (state, action) => {
                 state.loading.loggedUser = false;
                 state.error.loggedUser = action.payload as string;
+            })
+            // GET USERS
+            .addCase(getUsers.fulfilled, (state, action: PayloadAction<IUser[]>) => {
+                state.users = action.payload;
             })
     },
 })

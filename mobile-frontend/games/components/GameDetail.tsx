@@ -6,7 +6,7 @@ import { Pressable } from '@/components/ui/pressable';
 import { HomeStackParamList } from '@/navigation/types';
 import { RouteProp, useFocusEffect, useNavigation, useRoute } from '@react-navigation/native';
 import { Text } from "@/components/ui/text";
-import { Clock4, Heart, LandPlot, Menu as MenuIcon, Plus, SquarePen, Trash2, User } from 'lucide-react-native';
+import { Calendar, Clock4, Crown, Heart, LandPlot, Menu as MenuIcon, Plus, SquarePen, Trash2, User } from 'lucide-react-native';
 import React, { useCallback } from 'react'
 import { ScrollView } from 'react-native';
 import { getGameById } from '../gameSlice';
@@ -28,6 +28,7 @@ import { CollectionType } from '@/collections/types';
 import { addGameToCollection } from '@/collections/api/addGameToCollection';
 import { getCollections } from '@/collections/api/getCollections';
 import CollectionsActionSheet from '@/collections/components/CollectionsActionSheet';
+import dayjs from 'dayjs';
 
 const GameDetail = () => {
 
@@ -45,11 +46,14 @@ const GameDetail = () => {
     const collections = useAppSelector((state) => state.collection.collections);
 
     const user = useAppSelector((state) => state.user.loggedUser);
+    const users = useAppSelector((state) => state.user.users);
 
     const favoriteCollection = collections.find((collection) => collection.attributes.type === CollectionType.FAVORITE);
     const isGameInFavoriteCollection = favoriteCollection?.attributes.games.includes(gameId);
 
-    const { name, favorites, duration, minPlayers, description, equipment } = game?.attributes ?? {};
+    const { name, favorites, duration, minPlayers, description, equipment, createdBy, createdAt, author } = game?.attributes ?? {};
+
+    const createdByUser = users.find((user) => user.id === createdBy);
 
     const place = places.find((place) => place.id === game?.attributes.place);
     const placesMap = createPlacesMap(24);
@@ -92,7 +96,10 @@ const GameDetail = () => {
     }
 
     return (
-        <Box>
+        <Box style={{
+            backgroundColor: "#FDFDFD",
+            height: "100%",
+        }}>
             {game && <Box style={{
                 paddingVertical: 20,
                 paddingBottom: 16,
@@ -199,7 +206,7 @@ const GameDetail = () => {
                         marginLeft: 24,
                     }}
                 >
-                    <HStack style={{ marginTop: 4 }} space="sm">
+                    <HStack style={{ marginTop: 4, paddingBottom: 8 }} space="sm">
                         {categories
                             .filter((category) => game.attributes.categories.includes(category.id))
                             .map((category) => {
@@ -210,9 +217,9 @@ const GameDetail = () => {
                                         variant={"solid"}
                                         style={{
                                             borderRadius: 12,
-                                            backgroundColor: "#4D4D4D", // color,
+                                            backgroundColor: color, //"#4D4D4D", // color,
                                             borderWidth: 1,
-                                            borderColor: "#4D4D4D",
+                                            borderColor: color //"#4D4D4D",
                                         }}
                                     >
                                         <ButtonText style={{ color: "#fff" }}>{category.attributes.name.charAt(0).toUpperCase() + category.attributes.name.slice(1)}</ButtonText>
@@ -221,7 +228,7 @@ const GameDetail = () => {
                             })}
                     </HStack>
                 </ScrollView>
-                <HStack space="xl" style={{ paddingHorizontal: 24, paddingTop: 8 }}>
+                <HStack space="xl" style={{ paddingHorizontal: 24, paddingTop: 8, paddingBottom: 16, }}>
                     <HStack space="xs" style={{ alignItems: "center" }}>
                         <LandPlot size={16} color={"#6D6D6D"} />
                         <Text style={{ color: "#6D6D6D" }}>{text}</Text>
@@ -239,44 +246,83 @@ const GameDetail = () => {
                         <Text style={{ color: "#6D6D6D" }}>{`${minPlayers}+`}</Text>
                     </HStack>
                 </HStack>
-                <Box style={{ paddingHorizontal: 24, paddingTop: 16 }}>
-                    <Text size='lg' style={{ color: "#4D4D4D", textAlign: "justify" }}>
-                        {description}
-                    </Text>
-                </Box>
-                {equipment && equipment.length > 0 &&
-                    <Box style={{ paddingHorizontal: 24, paddingTop: 16 }}>
-                        <Heading size="lg" style={{ color: "#4D4D4D" }}>
-                            Equipment
-                        </Heading>
-                        <ScrollView horizontal
-                            showsHorizontalScrollIndicator={false}
-                        >
-                            <CheckboxGroup
-                                style={{ paddingTop: 8 }}
-                                value={values}
-                                onChange={(keys) => {
-                                    setValues(keys)
-                                }}
-                            >
-                                <HStack space="lg">
-                                    {equipment.map((item, index) =>
-                                        <Checkbox key={index} value={item} size='md'>
-                                            <CheckboxIndicator
-                                                style={{
-                                                    borderColor: "#4D4D4D",
-                                                    backgroundColor: values.includes(item as never) ? "#4D4D4D" : "transparent",
-                                                }}
-                                            >
-                                                <CheckboxIcon as={CheckIcon} />
-                                            </CheckboxIndicator>
-                                            <CheckboxLabel style={{ color: "#4D4D4D" }}>{item}</CheckboxLabel>
-                                        </Checkbox>
-                                    )}
+
+                <ScrollView contentContainerStyle={{ paddingBottom: 200 }}>
+                    <Box>
+                        <HStack style={{ paddingHorizontal: 24, paddingBottom: 24 }}>
+                            <VStack space='xs' style={{ flex: 1 }}>
+                                <Heading size="lg" style={{ color: "#4D4D4D" }}>
+                                    Created by
+                                </Heading>
+                                <HStack space='sm' style={{ alignItems: "center" }}>
+                                    <User size={18} color={"#6D6D6D"} />
+                                    <Text size='lg' style={{ color: "#4D4D4D", textAlign: "justify" }}>
+                                        {createdByUser?.attributes.username}
+                                    </Text>
                                 </HStack>
-                            </CheckboxGroup>
-                        </ScrollView>
-                    </Box>}
+                                <HStack space='sm' style={{ alignItems: "center" }}>
+                                    <Calendar size={18} color={"#6D6D6D"} />
+                                    <Text size='md' style={{ color: "#4D4D4D", textAlign: "justify" }}>
+                                        {dayjs(createdAt).format("DD/MM/YYYY")}
+                                    </Text>
+                                </HStack>
+                            </VStack>
+                            <VStack space='xs' style={{ flex: 1 }}>
+                                <Heading size="lg" style={{ color: "#4D4D4D" }}>
+                                    Author
+                                </Heading>
+                                <HStack space='sm' style={{ alignItems: "center" }}>
+                                    <Crown size={17} color={"#6D6D6D"} />
+                                    <Text size='lg' style={{ color: "#4D4D4D", textAlign: "justify" }}>
+                                        {author}
+                                    </Text>
+                                </HStack>
+                            </VStack>
+                        </HStack>
+
+                        <VStack space='sm' style={{ paddingHorizontal: 24 }}>
+                            <Heading size="lg" style={{ color: "#4D4D4D" }}>
+                                Description
+                            </Heading>
+                            <Text size='lg' style={{ color: "#4D4D4D", textAlign: "justify" }}>
+                                {description}
+                            </Text>
+                        </VStack>
+                        {equipment && equipment.length > 0 &&
+                            <Box style={{ paddingHorizontal: 24, paddingTop: 16 }}>
+                                <Heading size="lg" style={{ color: "#4D4D4D" }}>
+                                    Equipment
+                                </Heading>
+                                <ScrollView horizontal
+                                    showsHorizontalScrollIndicator={false}
+                                >
+                                    <CheckboxGroup
+                                        style={{ paddingTop: 8 }}
+                                        value={values}
+                                        onChange={(keys) => {
+                                            setValues(keys)
+                                        }}
+                                    >
+                                        <HStack space="lg">
+                                            {equipment.map((item, index) =>
+                                                <Checkbox key={index} value={item} size='md'>
+                                                    <CheckboxIndicator
+                                                        style={{
+                                                            borderColor: "#4D4D4D",
+                                                            backgroundColor: values.includes(item as never) ? "#4D4D4D" : "transparent",
+                                                        }}
+                                                    >
+                                                        <CheckboxIcon as={CheckIcon} />
+                                                    </CheckboxIndicator>
+                                                    <CheckboxLabel style={{ color: "#4D4D4D" }}>{item}</CheckboxLabel>
+                                                </Checkbox>
+                                            )}
+                                        </HStack>
+                                    </CheckboxGroup>
+                                </ScrollView>
+                            </Box>}
+                    </Box>
+                </ScrollView>
             </Box>}
             <Modal
                 style={{ top: -90 }}
@@ -368,7 +414,7 @@ const GameDetail = () => {
                     setOpenCollectionActionsheet(false)
                     dispatch(getGame(gameId));
                 }} />
-        </Box>
+        </Box >
     )
 }
 
