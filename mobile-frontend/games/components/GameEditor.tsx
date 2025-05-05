@@ -129,12 +129,22 @@ const GameEditor = () => {
                                     space="xs"
                                 >
                                     <Heading size={labelSize} style={{ color: "#4D4D4D" }}>
-                                        Name
+                                        Name*
                                     </Heading>
                                     <Controller
                                         control={control}
+                                        rules={{
+                                            required: true,
+                                        }}
                                         render={({ field: { onChange, onBlur, value } }) => (
-                                            <Input size="lg" style={{ backgroundColor: "#fff", borderRadius: 12, height: 48 }}>
+                                            <Input
+                                                size="lg"
+                                                isInvalid={!!errors.name}
+                                                style={{
+                                                    backgroundColor: "#fff",
+                                                    borderRadius: 12,
+                                                    height: 48
+                                                }}>
                                                 <InputField
                                                     onBlur={onBlur}
                                                     onChangeText={onChange}
@@ -198,12 +208,13 @@ const GameEditor = () => {
                                 <HStack style={{ justifyContent: "space-between", paddingHorizontal: 24, }}>
                                     <VStack space="xs" style={{ width: "48%" }}>
                                         <Heading size={labelSize} style={{ color: "#4D4D4D" }}>
-                                            Place
+                                            Place*
                                         </Heading>
                                         {placesMap &&
                                             <Controller
                                                 name="place"
                                                 control={control}
+                                                rules={{ required: true }}
                                                 render={({ field: { onChange, value } }) => {
 
                                                     const initialPlace = places.find((place) => place.id === value);
@@ -211,6 +222,7 @@ const GameEditor = () => {
 
                                                     return (
                                                         <Select
+                                                            isInvalid={!!errors.place}
                                                             selectedValue={value}
                                                             onValueChange={(val) => {
                                                                 onChange(val);
@@ -260,12 +272,15 @@ const GameEditor = () => {
                                     </VStack>
                                     <VStack space="xs" style={{ width: "48%" }}>
                                         <Heading size={labelSize} style={{ color: "#4D4D4D" }}>
-                                            Author
+                                            Author*
                                         </Heading>
                                         <Controller
                                             control={control}
+                                            rules={{ required: true }}
                                             render={({ field: { onChange, onBlur, value } }) => (
-                                                <Input size="lg" style={{ backgroundColor: "#fff", borderRadius: 12, height: 48 }}>
+                                                <Input
+                                                    isInvalid={!!errors.author}
+                                                    size="lg" style={{ backgroundColor: "#fff", borderRadius: 12, height: 48 }}>
                                                     <InputField
                                                         onBlur={onBlur}
                                                         onChangeText={onChange}
@@ -289,7 +304,7 @@ const GameEditor = () => {
                                         }}
                                     >
                                         <Heading size={labelSize} style={{ color: "#4D4D4D" }}>
-                                            Durations
+                                            Durations*
                                         </Heading>
                                         <DurationPickerField control={control} />
                                     </VStack>
@@ -300,7 +315,7 @@ const GameEditor = () => {
                                         }}
                                     >
                                         <Heading size={labelSize} style={{ color: "#4D4D4D" }}>
-                                            Players
+                                            Players*
                                         </Heading>
                                         <Controller
                                             control={control}
@@ -308,6 +323,7 @@ const GameEditor = () => {
                                             rules={{ required: true }}
                                             render={({ field: { onChange, onBlur, value } }) => (
                                                 <Input
+                                                    isInvalid={!!errors.minPlayers}
                                                     size="lg"
                                                     style={{ backgroundColor: "#fff", borderRadius: 12, height: 48, paddingRight: 8 }}
                                                 >

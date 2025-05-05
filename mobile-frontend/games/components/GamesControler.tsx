@@ -44,7 +44,7 @@ const GamesController = ({ placeId, collectionId }: GamesControllerProps) => {
     const handleRefresh = async () => {
         if (refreshing) return;
         setRefreshing(true);
-        await fetchGames(); // ✅ musíš počkat
+        await fetchGames();
         setRefreshing(false);
     };
 

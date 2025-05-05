@@ -15,8 +15,6 @@ interface ListHeaderProps {
     showFilter?: boolean;
 }
 
-const HEADER_HEIGHT = 80;
-
 export const ListHeader = ({
     translateYStyle,
     onFilterPress,

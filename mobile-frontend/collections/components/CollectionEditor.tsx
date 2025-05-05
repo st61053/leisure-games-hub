@@ -97,7 +97,9 @@ const CollectionEditor = () => {
                                             required: true
                                         }}
                                         render={({ field: { onChange, onBlur, value } }) => (
-                                            <Input size="lg" style={{ backgroundColor: "#fff", borderRadius: 12, height: 48 }}>
+                                            <Input
+                                                isInvalid={!!errors.name}
+                                                size="lg" style={{ backgroundColor: "#fff", borderRadius: 12, height: 48 }}>
                                                 <InputField
                                                     onBlur={onBlur}
                                                     onChangeText={onChange}

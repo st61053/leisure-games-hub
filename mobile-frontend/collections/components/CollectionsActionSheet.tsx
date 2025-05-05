@@ -3,17 +3,16 @@ import { Actionsheet, ActionsheetBackdrop, ActionsheetContent, ActionsheetDragIn
 import { Box } from "@/components/ui/box";
 import { Heading } from "@/components/ui/heading";
 import { HStack } from "@/components/ui/hstack";
-import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
-import { Pressable } from "@/components/ui/pressable";
-import { VStack } from "@/components/ui/vstack"
-import { Boxes, ChevronDown, Heart, Plus, SearchIcon, Square, SquareCheckBig } from "lucide-react-native";
-import { Keyboard, KeyboardAvoidingView, Platform, ScrollView, TouchableWithoutFeedback } from "react-native";
+import { Boxes, Heart, Square, SquareCheckBig } from "lucide-react-native";
+import { Keyboard, KeyboardAvoidingView, Platform, TouchableWithoutFeedback } from "react-native";
 import { Text } from "@/components/ui/text";
 import { addGameToCollection } from "../api/addGameToCollection";
 import { getCollections } from "../api/getCollections";
-import { getFilteredGames } from "@/games/api/getFilteredGames";
 import { CollectionType } from "../types";
-import { Button, ButtonText } from "@/components/ui/button";
+import { ListScreenLayout } from "@/components/shared/ListScreenLayout";
+import { ListHeader } from "@/components/shared/ListHeader";
+import { FlatItemList } from "@/components/shared/FlatItemList";
+import { Item } from "@/components/shared/Item";
 
 interface CollectionsActionSheetProps {
     isOpen: boolean;
@@ -24,26 +23,7 @@ interface CollectionsActionSheetProps {
 const CollectionsActionSheet = ({ isOpen, gameId, onClose }: CollectionsActionSheetProps) => {
 
     const dispatch = useAppDispatch();
-
     const collections = useAppSelector((state) => state.collection.collections);
-    const categories = useAppSelector((state) => state.game.categories);
-    const games = useAppSelector((state) => state.game.games);
-
-    const game = games.find((game) => game.id === gameId);
-
-    const fetchGames = () => {
-        dispatch(getFilteredGames(
-            [
-                {
-                    key: "place",
-                    value: String(game?.attributes.place)
-                },
-                ...categories.filter((category) => category.attributes.active).map((category) => ({
-                    key: "categories",
-                    value: category.id
-                }))
-            ]));
-    }
 
     return (
         <KeyboardAvoidingView
@@ -54,78 +34,46 @@ const CollectionsActionSheet = ({ isOpen, gameId, onClose }: CollectionsActionSh
                     isOpen={isOpen}
                     onClose={() => {
                         onClose();
-                        // fetchGames();
                     }}>
                     <ActionsheetBackdrop />
                     <ActionsheetContent style={{ paddingHorizontal: 0 }}>
                         <ActionsheetDragIndicatorWrapper>
                             <ActionsheetDragIndicator />
                         </ActionsheetDragIndicatorWrapper>
-                        <VStack style={{ width: "100%", minHeight: 400, maxHeight: 600 }} space="xs">
-                            <HStack style={{ alignItems: "center", paddingHorizontal: 20 }}>
-                                <Heading size="lg" style={{ color: "#4D4D4D", flex: 1, paddingLeft: 2 }}>
+                        <Box style={{ minHeight: 400, height: 640, width: "100%", overflow: "hidden" }}>
+                            <HStack style={{ alignItems: "center", paddingHorizontal: 20, zIndex: 1, backgroundColor: "#FDFDFD", paddingTop: 8 }}>
+                                <Heading size="xl" style={{ color: "#4D4D4D", flex: 1, paddingLeft: 2 }}>
                                     Add to collection
                                 </Heading>
-                                <Pressable
-                                // onPress={() => {
-                                //     navigation.navigate('CreateGame', {
-                                //         placeId: placeId,
-                                //     });
-                                // }}
-                                >
-                                    {({ pressed }) => (
-                                        <Box style={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            padding: 12,
-                                            borderRadius: "50%",
-                                            backgroundColor: pressed ? "#D4D4D4" : "transparent",
-                                            right: -8
-                                        }}>
-                                            <Plus
-                                                strokeWidth={3}
-                                                color={"#4D4D4D"}
-                                                size={20}
-                                            />
-                                        </Box>
+                            </HStack>
+                            <ListScreenLayout
+                                itemCount={collections.length}
+                                header={(animatedStyle) => (
+                                    <ListHeader
+                                        translateYStyle={animatedStyle}
+                                        onFilterPress={() => console.log("filter pressed")}
+                                        showFilter={false}
+                                    />
+                                )}
+                            >
+                                <FlatItemList
+                                    items={collections}
+                                    loading={false}
+                                    emptyMessage="No collections found."
+                                    renderItem={({ item: collection }) => {
 
-                                    )}
-                                </Pressable>
-                            </HStack>
-                            <Box style={{ paddingHorizontal: 20 }}>
-                                <Input size="lg" style={{ width: "100%", backgroundColor: "#fff", borderRadius: 12, height: 48 }}>
-                                    <InputSlot style={{ paddingLeft: 16 }}>
-                                        <InputIcon as={SearchIcon} />
-                                    </InputSlot>
-                                    <InputField placeholder="Search..." />
-                                </Input>
-                            </Box>
-                            <HStack style={{ paddingHorizontal: 24 }} space="xl">
-                                <Button variant="link">
-                                    <ButtonText className="font-medium text-md text-typography-900">
-                                        Name
-                                    </ButtonText>
-                                    <ChevronDown color={"#4D4D4D"} size={18} />
-                                </Button>
-                                <Button variant="link">
-                                    <ButtonText className="font-medium text-md text-typography-900">
-                                        Games
-                                    </ButtonText>
-                                    {/* <ChevronDown color={"#4D4D4D"} size={18} /> */}
-                                </Button>
-                            </HStack>
-                            <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
-                                <VStack space="xs" style={{ paddingTop: 4 }}>
-                                    {collections.map((collection) => {
+                                        const { name, games, type } = collection.attributes;
 
                                         const isGameInCollection = collection.attributes.games.some((game) => game === gameId);
 
-                                        const gamesCount = collection.attributes.games.length;
-
                                         return (
-                                            <Pressable
-                                                key={collection.id}
+                                            <Item
+                                                color={"#4D4D4D"}
+                                                title={name}
+                                                leftSlot={type === CollectionType.FAVORITE ? <Heart color={"#fff"} size={28} /> : <Boxes color={"#fff"} size={28} />}
+                                                meta={
+                                                    <Text style={{ color: "#6D6D6D", top: -2 }}>{`${games.length} ${games.length > 1 ? "games" : "game"}`}</Text>
+                                                }
                                                 onPress={async () => {
                                                     await dispatch(addGameToCollection({
                                                         collectionId: String(collection.id),
@@ -135,42 +83,18 @@ const CollectionsActionSheet = ({ isOpen, gameId, onClose }: CollectionsActionSh
 
                                                     dispatch(getCollections());
                                                 }}
-                                            >
-                                                {({ pressed }) => (
-                                                    <HStack space="md" style={{ backgroundColor: pressed ? "#E0E0E0" : "transparent", paddingVertical: 6, paddingHorizontal: 24, alignItems: "center" }}>
-                                                        <Box
-                                                            style={{
-                                                                backgroundColor: "#4D4D4D",
-                                                                padding: 10,
-                                                                borderRadius: 6,
-                                                                shadowColor: '#000',
-                                                                shadowOffset: { width: 0, height: 2 },
-                                                                shadowOpacity: 0.15,
-                                                                shadowRadius: 4,
-                                                                elevation: 4, // pro Android
-                                                            }}>
-                                                            {collection.attributes.type === CollectionType.FAVORITE ? <Heart color={"#fff"} size={24} /> : <Boxes color={"#fff"} size={28} />}
-                                                        </Box>
-                                                        <VStack style={{ flex: 1 }}>
-                                                            <Heading size="md" style={{ color: "#4D4D4D" }}>
-                                                                {collection.attributes.name}
-                                                            </Heading>
-                                                            <Text size="sm" style={{ top: -4 }}>
-                                                                {`${gamesCount} ${gamesCount > 1 ? "games" : "game"}`}
-                                                            </Text>
-                                                        </VStack>
-                                                        {isGameInCollection
-                                                            ? <SquareCheckBig size={24} color={"#4D4D4D"} />
-                                                            : <Square size={24} color={"#4D4D4D"} />
-                                                        }
-                                                    </HStack>
-                                                )}
-                                            </Pressable>
-                                        )
-                                    })}
-                                </VStack>
-                            </ScrollView>
-                        </VStack>
+                                                rightSlot={isGameInCollection
+                                                    ? <SquareCheckBig size={24} color={"#4D4D4D"} style={{ left: -4 }} />
+                                                    : <Square size={24} color={"#4D4D4D"} style={{ left: -4 }} />
+                                                }
+
+                                            />
+                                        );
+                                    }}
+                                />
+                            </ListScreenLayout>
+                        </Box>
+
                     </ActionsheetContent>
                 </Actionsheet>
             </TouchableWithoutFeedback>

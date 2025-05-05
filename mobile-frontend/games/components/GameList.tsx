@@ -45,7 +45,7 @@ const GamesList = ({ onRefresh, refreshing }: GamesListProps) => {
                 renderItem={({ item: game }) => {
 
                     const placeName = places.find((p) => p.id === game.attributes.place)?.attributes.name;
-                    const { icon, color } = createPlacesMap(32)[placeName as PlaceType];
+                    const { icon, color } = createPlacesMap(28)[placeName as PlaceType];
                     const { name, favorites, duration, minPlayers } = game.attributes;
                     const isFavorited = favoriteCollection?.attributes.games.includes(game.id);
 
