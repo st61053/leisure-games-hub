@@ -1,5 +1,6 @@
 package org.example.backend.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.backend.component.ApiData;
 import org.example.backend.component.ApiResourceType;
@@ -95,6 +96,7 @@ public class GameService {
         return buildActionResponse(game.getId(), "GAME_UPDATED");
     }
 
+    @Transactional
     public ResponseEntity<ActionResponseDto> delete(String id) {
         gameCollectionRepository.removeGameFromAllCollections(id);
         gameRepository.deleteById(id);

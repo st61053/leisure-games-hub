@@ -144,6 +144,7 @@ const GameCollectionList = () => {
             </Box>
             <GamesController collectionId={collection?.id} />
             <Modal
+                style={{ top: -70 }}
                 isOpen={showRemoveModal}
                 onClose={() => {
                     setShowRemoveModal(false);
@@ -212,7 +213,9 @@ const GameCollectionList = () => {
                                         setShowRemoveModal(false);
                                         reset({ name: "" });
                                         await dispatch(deleteCollection(collectionId));
-                                        navigation.goBack();
+                                        setTimeout(() => {
+                                            navigation.goBack();
+                                        }, 400);
                                     }}
                                 >
                                     <ButtonText>Confirm</ButtonText>

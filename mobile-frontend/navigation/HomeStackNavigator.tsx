@@ -7,21 +7,17 @@ import { ChevronLeft } from 'lucide-react-native';
 
 import { HomeStackParamList } from '@/navigation/types';
 import GamePlaceList from '@/games/components/GamePlaceList';
-import { createPlacesMap } from '@/games/constants';
 import GameDetail from '@/games/components/GameDetail';
 import { Ionicons } from '@expo/vector-icons';
 import GameEditor from '@/games/components/GameEditor';
 import GameCollectionList from '@/games/components/GameCollectionList';
 import CollectionEditor from '@/collections/components/CollectionEditor';
-// import CollectionEditor from '@/collections/components/CollectionEditor';
 
 const Stack = createNativeStackNavigator<HomeStackParamList>();
 
 
 
 const HomeStackNavigator = () => {
-
-    const placesMap = createPlacesMap(24);
 
     return (
         <Stack.Navigator>
@@ -32,7 +28,6 @@ const HomeStackNavigator = () => {
                     title: 'Games',
                     headerLeft: () => (
                         <TouchableOpacity style={{ paddingHorizontal: 4 }}>
-                            {/* <Icon style={{ color: "#4D4D4D" }} as={LayoutGrid} /> */}
                             <Ionicons name="apps" size={16} color="#4D4D4D" style={{ paddingLeft: 4 }} />
                         </TouchableOpacity>
                     ),

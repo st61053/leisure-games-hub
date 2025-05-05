@@ -16,7 +16,7 @@ interface FlatItemListProps<T> {
     emptyMessage?: string;
     keyExtractor?: (item: T, index: number) => string;
     showDividers?: boolean;
-    onRefresh?: () => void;              // ✅ nový prop
+    onRefresh?: () => void;
     refreshing?: boolean;
 }
 

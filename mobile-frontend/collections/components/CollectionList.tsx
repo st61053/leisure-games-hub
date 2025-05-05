@@ -31,9 +31,9 @@ const CollectionList = ({ collections, loading }: CollectionListProps) => {
                     <Item
                         color={"#4D4D4D"}
                         title={name}
-                        leftSlot={type === CollectionType.FAVORITE ? <Heart color={"#fff"} size={28} /> : <Boxes color={"#fff"} size={28} />}
+                        leftSlot={type === CollectionType.FAVORITE ? <Heart color={"#fff"} size={32} /> : <Boxes color={"#fff"} size={32} />}
                         meta={
-                            <Text style={{ color: "#6D6D6D", top: -2 }}>{`${games.length} ${games.length > 1 ? "games" : "game"}`}</Text>
+                            <Text style={{ color: "#6D6D6D", top: -4 }}>{`${games.length} ${games.length > 1 ? "games" : "game"}`}</Text>
                         }
                         onPress={() => navigation.navigate('GameCollection', {
                             collectionId: collection.id

@@ -44,6 +44,8 @@ const GameDetail = () => {
     const places = useAppSelector((state) => state.game.places);
     const collections = useAppSelector((state) => state.collection.collections);
 
+    const user = useAppSelector((state) => state.user.loggedUser);
+
     const favoriteCollection = collections.find((collection) => collection.attributes.type === CollectionType.FAVORITE);
     const isGameInFavoriteCollection = favoriteCollection?.attributes.games.includes(gameId);
 
@@ -58,6 +60,8 @@ const GameDetail = () => {
 
     const [showRemoveModal, setShowRemoveModal] = React.useState(false)
     const [openCollectionActionsheet, setOpenCollectionActionsheet] = React.useState(false);
+
+    const isEditedAllowed = game?.attributes.createdBy === user?.id;
 
     useFocusEffect(
         useCallback(() => {
@@ -138,7 +142,7 @@ const GameDetail = () => {
                         placement="bottom right"
                         onOpen={() => setShowModal(true)}
                         onClose={() => setShowModal(false)}
-                        style={{ width: 204 }}
+                        style={{ width: 204, top: 90 }}
                         trigger={({ ...triggerProps }) => {
                             return (
                                 <Pressable {...triggerProps}>
@@ -162,23 +166,23 @@ const GameDetail = () => {
                             )
                         }}
                     >
-                        <MenuItem onPress={() => {
+                        {isEditedAllowed && <MenuItem onPress={() => {
                             navigation.navigate('EditGame', {
                                 gameId: game.id,
                             });
                         }} key="Edit" textValue="edit" style={{ paddingVertical: 8, paddingHorizontal: 12 }}>
                             <Icon as={SquarePen} size="md" style={{ marginRight: 12, color: "#4D4D4D" }} />
                             <MenuItemLabel size="lg" style={{ flexShrink: 1 }}>Edit</MenuItemLabel>
-                        </MenuItem>
-                        <MenuItem
+                        </MenuItem>}
+                        {isEditedAllowed && <MenuItem
                             onPress={() => {
                                 setShowRemoveModal(true)
                             }}
                             key="remove" textValue="edit" style={{ paddingVertical: 8, paddingHorizontal: 12 }}>
                             <Icon as={Trash2} size="md" style={{ marginRight: 12, color: "#4D4D4D" }} />
                             <MenuItemLabel size="lg" style={{ flexShrink: 1 }}>Delete</MenuItemLabel>
-                        </MenuItem>
-                        <MenuSeparator />
+                        </MenuItem>}
+                        {isEditedAllowed && <MenuSeparator />}
                         <MenuItem
                             onPress={() => {
                                 setOpenCollectionActionsheet(true);
@@ -275,6 +279,7 @@ const GameDetail = () => {
                     </Box>}
             </Box>}
             <Modal
+                style={{ top: -90 }}
                 isOpen={showRemoveModal}
                 onClose={() => {
                     setShowRemoveModal(false);
@@ -343,7 +348,9 @@ const GameDetail = () => {
                                         setShowRemoveModal(false);
                                         reset({ name: "" });
                                         await dispatch(deleteGame(gameId));
-                                        navigation.goBack();
+                                        setTimeout(() => {
+                                            navigation.goBack();
+                                        }, 400);
                                     }}
                                 >
                                     <ButtonText>Confirm</ButtonText>

@@ -45,7 +45,7 @@ const GamesList = ({ onRefresh, refreshing }: GamesListProps) => {
                 renderItem={({ item: game }) => {
 
                     const placeName = places.find((p) => p.id === game.attributes.place)?.attributes.name;
-                    const { icon, color } = createPlacesMap(28)[placeName as PlaceType];
+                    const { icon, color } = createPlacesMap(32)[placeName as PlaceType];
                     const { name, favorites, duration, minPlayers } = game.attributes;
                     const isFavorited = favoriteCollection?.attributes.games.includes(game.id);
 
@@ -60,7 +60,7 @@ const GamesList = ({ onRefresh, refreshing }: GamesListProps) => {
                                         <Heart
                                             size={16}
                                             color="#6D6D6D"
-                                            fill={isFavorited ? "#6D6D6D" : "transparent"}
+                                        // fill={isFavorited ? "#6D6D6D" : "transparent"}
                                         />
                                         <Text style={{ color: "#6D6D6D" }}>{favorites}</Text>
                                     </HStack>

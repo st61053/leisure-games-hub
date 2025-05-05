@@ -16,7 +16,7 @@ export const deleteGame = createAsyncThunk(
                 return rejectWithValue(errorData.message || "Login failed");
             }
 
-            await response.json();
+            const json = await response.json();
 
         } catch (error: any) {
             return rejectWithValue(error.message || "Network error");

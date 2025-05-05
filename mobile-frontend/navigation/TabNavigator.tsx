@@ -35,41 +35,45 @@ const TabNavigator = () => {
                     name="HomeTab"
                     component={HomeStackNavigator}
                     options={{
-                        tabBarShowLabel: false,
+                        // tabBarShowLabel: false,
                         title: 'Home',
-                        tabBarIcon: ({ focused }) => <Icon style={{ marginTop: 20, color: focused ? "#1976d2" : "#4D4D4D" }} size='xl' className="text-typography-500" as={House} />,
+                        tabBarIcon: ({ focused }) => <Icon style={{ marginTop: 16, color: focused ? "#1976d2" : "#4D4D4D" }} size='xl' className="text-typography-500" as={House} />,
+                        tabBarLabelStyle: { top: 8 }
                     }}
                 />
                 <Tab.Screen
                     name="Scheduler"
                     component={Placeholder}
                     options={{
-                        tabBarShowLabel: false,
-                        tabBarIcon: ({ focused }) => <Icon style={{ marginTop: 20, color: focused ? "#1976d2" : "#4D4D4D" }} size='xl' className="text-typography-500" as={Calendar1} />,
+                        // tabBarShowLabel: false,
+                        tabBarIcon: ({ focused }) => <Icon style={{ marginTop: 16, color: focused ? "#1976d2" : "#4D4D4D" }} size='xl' className="text-typography-500" as={Calendar1} />,
+                        tabBarLabelStyle: { top: 8 }
                     }}
                 />
                 <Tab.Screen
                     name="Chat"
                     component={Placeholder}
                     options={{
-                        tabBarShowLabel: false,
-                        tabBarIcon: ({ focused }) => <Icon style={{ marginTop: 20, color: focused ? "#1976d2" : "#4D4D4D" }} size='xl' as={MessageSquareText} />,
+                        // tabBarShowLabel: false,
+                        tabBarIcon: ({ focused }) => <Icon style={{ marginTop: 16, color: focused ? "#1976d2" : "#4D4D4D" }} size='xl' as={MessageSquareText} />,
                         tabBarBadge: 10,
                         tabBarBadgeStyle: { backgroundColor: 'red', minWidth: 17, height: 17, borderRadius: "50%", fontSize: 7, fontWeight: "bold", top: 5 },
+                        tabBarLabelStyle: { top: 8 }
                     }}
                 />
                 <Tab.Screen
                     name="Profile"
                     component={ProfileStackNavigator}
                     options={{
-                        tabBarShowLabel: false,
+                        // tabBarShowLabel: false,
                         tabBarIcon: ({ focused }) => (
-                            <Avatar size="sm" style={{ marginTop: 18 }}>
-                                <AvatarFallbackText size='xs' style={{ color: "white" }}>
+                            <Avatar style={{ marginTop: 24, height: 40, width: 40 }}>
+                                <AvatarFallbackText size='sm' style={{ color: "white" }}>
                                     {`${user?.attributes?.firstname} ${user?.attributes?.lastname}`}
                                 </AvatarFallbackText>
                             </Avatar>
                         ),
+                        tabBarLabelStyle: { display: "none" },
                     }}
                 />
             </Tab.Navigator>
