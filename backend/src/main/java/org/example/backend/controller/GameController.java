@@ -3,6 +3,8 @@ package org.example.backend.controller;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.example.backend.dto.*;
+import org.example.backend.enums.GameSortByType;
+import org.example.backend.enums.SortOrder;
 import org.example.backend.service.GameService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -47,9 +49,12 @@ public class GameController {
             @RequestParam(required = false) String place,
             @RequestParam(required = false) List<String> categories,
             @RequestParam(required = false) String name,
-            @RequestParam(required = false) String collection
+            @RequestParam(required = false) String collection,
+            @RequestParam(required = false, defaultValue = "CREATED_AT") GameSortByType sortBy,
+            @RequestParam(required = false, defaultValue = "ASC") SortOrder sortOrder
     ) {
-        return ResponseEntity.ok(gameService.filterGames(place, categories, name, collection));
+        return ResponseEntity.ok(gameService.filterGames(place, categories, name, collection, sortBy, sortOrder));
     }
+
 }
 

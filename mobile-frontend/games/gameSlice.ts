@@ -1,27 +1,54 @@
 import { createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
-import { ICategory, IGame, IGameState, IPlace } from './types'
+import { GamesSortBy, ICategory, IGame, IGameState, IPlace } from './types'
 import { getPlaces } from './api/getPlaces'
 import { getCategories } from './api/getCategories'
 import { getFilteredGames } from './api/getFilteredGames'
 import { RootState } from '@/app/store'
 import { getGame } from './api/getGame'
+import { SortOrder } from '@/app/config'
 
 const initialState: IGameState = {
     games: [],
     places: [],
     categories: [],
     loading: false,
+    filters: {
+        categories: [],
+        sort: {
+            by: GamesSortBy.CREATED_AT,
+            order: SortOrder.ASC,
+        }
+    }
 }
 
 export const gameSlice = createSlice({
     name: 'game',
     initialState,
     reducers: {
-        activeCategory: (state, action: PayloadAction<string>) => {
-            const category = state.categories.find((category) => category.id === action.payload);
-            if (category) {
-                category.attributes.active = !category.attributes.active;
+        activeCategory: (state, action: PayloadAction<ICategory>) => {
+
+            const category = state.filters.categories.find((category) => category.id === action.payload.id);
+
+            state.filters.categories =
+                category
+                    ? state.filters.categories.filter((category) => category.id !== action.payload.id)
+                    : [...state.filters.categories, action.payload];
+        },
+        setSort: (state, action: PayloadAction<GamesSortBy>) => {
+
+            const sort = state.filters.sort.by !== action.payload ? SortOrder.ASC : state.filters.sort.order === SortOrder.ASC ? SortOrder.DESC : SortOrder.ASC;
+
+            state.filters.sort = {
+                by: action.payload,
+                order: sort,
+            }
+        },
+        clearFilters: (state) => {
+            state.filters.categories = [];
+            state.filters.sort = {
+                by: GamesSortBy.CREATED_AT,
+                order: SortOrder.ASC,
             }
         }
     },
@@ -76,7 +103,7 @@ export const gameSlice = createSlice({
 export const getGameById = (id: string) => (state: RootState) =>
     state.game.games.find((game) => game.id === id);
 
-export const { activeCategory } = gameSlice.actions;
+export const { activeCategory, setSort, clearFilters } = gameSlice.actions;
 export const { getGamesById } = gameSlice.selectors;
 
 export default gameSlice.reducer

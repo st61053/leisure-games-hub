@@ -6,6 +6,7 @@ import { getFilteredGames } from "../api/getFilteredGames";
 import GameList from "./GameList";
 import { ListScreenLayout } from "@/components/shared/ListScreenLayout";
 import { ListHeader } from "@/components/shared/ListHeader";
+import GameFilterActionSheet from "./GameFilterActionSheet";
 
 interface GamesControllerProps {
     placeId?: string;
@@ -18,6 +19,7 @@ const GamesController = ({ placeId, collectionId }: GamesControllerProps) => {
     const games = useAppSelector((state: RootState) => state.game.games);
 
     const [refreshing, setRefreshing] = useState(false);
+    const [areFiltersOpen, setAreFiltersOpen] = useState(false);
 
     const getFilters = () => [
         ...(collectionId ? [{ key: "collection", value: collectionId }] : []),
@@ -49,17 +51,23 @@ const GamesController = ({ placeId, collectionId }: GamesControllerProps) => {
     };
 
     return (
-        <ListScreenLayout
-            itemCount={games.length}
-            header={(animatedStyle) => (
-                <ListHeader
-                    translateYStyle={animatedStyle}
-                    onFilterPress={() => console.log("filter pressed")}
-                />
-            )}
-        >
-            <GameList refreshing={refreshing} onRefresh={handleRefresh} />
-        </ListScreenLayout>
+        <>
+            <ListScreenLayout
+                itemCount={games.length}
+                header={(animatedStyle) => (
+                    <ListHeader
+                        translateYStyle={animatedStyle}
+                        onFilterPress={() => setAreFiltersOpen(true)}
+                    />
+                )}
+            >
+                <GameList refreshing={refreshing} onRefresh={handleRefresh} />
+            </ListScreenLayout>
+            <GameFilterActionSheet
+                isOpen={areFiltersOpen}
+                onClose={() => setAreFiltersOpen(false)}
+            />
+        </>
     );
 };
 

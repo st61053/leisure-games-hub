@@ -1,10 +1,14 @@
-import { IApiObject } from "@/app/config";
+import { IApiObject, SortOrder } from "@/app/config";
 
 export interface IGameState {
     games: IGame[];
     places: IPlace[];
     categories: ICategory[];
     loading: boolean;
+    filters: {
+        categories: ICategory[];
+        sort: IGameSort;
+    }
 }
 
 export interface IGame extends IApiObject {
@@ -50,4 +54,15 @@ export interface ICategory extends IApiObject {
 export interface GameQueryFilter {
     key: string;
     value: string | number | boolean | (string | number | boolean)[];
+}
+
+export enum GamesSortBy {
+    CREATED_AT = "createdAt",
+    NAME = "name",
+    FAVORITES = "favorites",
+}
+
+export interface IGameSort {
+    by: GamesSortBy;
+    order: SortOrder;
 }

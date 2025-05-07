@@ -51,7 +51,6 @@ const CollectionsActionSheet = ({ isOpen, gameId, onClose }: CollectionsActionSh
                                 header={(animatedStyle) => (
                                     <ListHeader
                                         translateYStyle={animatedStyle}
-                                        onFilterPress={() => console.log("filter pressed")}
                                         showFilter={false}
                                     />
                                 )}

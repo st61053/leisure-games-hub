@@ -6,6 +6,8 @@ import org.example.backend.component.ApiData;
 import org.example.backend.component.ApiResourceType;
 import org.example.backend.dto.*;
 import org.example.backend.entity.*;
+import org.example.backend.enums.GameSortByType;
+import org.example.backend.enums.SortOrder;
 import org.example.backend.repository.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -134,7 +136,9 @@ public class GameService {
             String place,
             List<String> categories,
             String name,
-            String collectionId
+            String collectionId,
+            GameSortByType sortBy,
+            SortOrder sortOrder
     ) {
         List<Game> games;
 
@@ -163,7 +167,21 @@ public class GameService {
                 .filter(game -> name == null || game.getName().toLowerCase().contains(name.toLowerCase()))
                 .toList();
 
-        List<ApiData<GameShortResponseDto>> response = filtered.stream()
+        Comparator<Game> comparator = switch (sortBy) {
+            case NAME -> Comparator.comparing(Game::getName, String.CASE_INSENSITIVE_ORDER);
+            case FAVORITES -> Comparator.comparingInt(Game::getFavorites);
+            case CREATED_AT -> Comparator.comparing(Game::getCreatedAt);
+        };
+
+        if (sortOrder == SortOrder.DESC) {
+            comparator = comparator.reversed();
+        }
+
+        List<Game> sorted = filtered.stream()
+                .sorted(comparator)
+                .toList();
+
+        List<ApiData<GameShortResponseDto>> response = sorted.stream()
                 .map(game -> new ApiData<>(
                         game.getId(),
                         ApiResourceType.GAME.getValue(),
@@ -173,6 +191,7 @@ public class GameService {
 
         return new ApiResponseDto<>(response);
     }
+
 
     private GameResponseDto mapToResponse(Game game) {
         List<String> categoryIds = game.getCategories().stream()

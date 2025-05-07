@@ -1,5 +1,5 @@
 
-export const SERVER_URL = 'http://192.168.1.104:9090/api/v1';
+export const SERVER_URL = 'http://192.168.1.103:9090/api/v1';
 
 type HttpMethod = "GET" | "POST" | "PUT" | "DELETE";
 
@@ -37,4 +37,9 @@ export enum ApiObjectType {
     USER = 'user',
     GAME = 'game',
     COLLECTION = 'collection',
+}
+
+export enum SortOrder {
+    ASC = 'asc',
+    DESC = 'desc',
 }
